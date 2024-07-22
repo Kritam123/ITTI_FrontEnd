@@ -43,7 +43,10 @@ export const authApi = apiSlice.injectEndpoints({
                 const result = await queryFulfilled;
                 dispatch(userLoggedIn({
                     refreshToken:result.data.refreshToken,
-                    isAuthenticated:result.data.isAuthenticated
+                    // @ts-ignore
+                    isAuthenticated:result.data.data.isAuthenticated,
+                    // @ts-ignore
+                    user:result.data.data.loggedUser
                 }))
             }
         }),
@@ -101,7 +104,8 @@ export const authApi = apiSlice.injectEndpoints({
                 const result = await queryFulfilled;
                 dispatch(userLoggedIn({
                     refreshToken:result.data.data.refreshToken,
-                    isAuthenticated:result.data.data.isAuthenticated
+                    isAuthenticated:result.data.data.isAuthenticated,
+                    user:result.data.data.loggedUser
                 }))
             }
         }),

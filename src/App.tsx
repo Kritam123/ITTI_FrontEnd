@@ -1,6 +1,6 @@
 // packages all
 import { useSelector } from "react-redux";
-import { useLoadUserQuery } from "./redux/features/api/apiSlice"
+import { useLazyLoadUserQuery, useLazyRefreshTokenQuery, useLoadUserQuery } from "./redux/features/api/apiSlice"
 import { RootState } from "./redux/store"
 
 import { Route, Routes, useNavigate } from "react-router-dom"
@@ -17,17 +17,28 @@ import Footer from "./components/CommonComponents/Footer"
 // pages all
 
 import React, { lazy, Suspense, useEffect } from "react"
+import {  useCookies } from "react-cookie";
 
 function App() {
   const navigate = useNavigate();
+  const [cookies] = useCookies(['refreshToken','accessToken']);
+  console.log(cookies['accessToken'],cookies['refreshToken'])
   const { userDetails, isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const { data, isLoading, isSuccess } = useLoadUserQuery("getUser", { skip: false });
-  useEffect(()=>{
+  // const { data, isLoading, isSuccess } = useLoadUserQuery("getUser", { skip: false });
+  const [tokenTigger] = useLazyRefreshTokenQuery();
+  const [trigger, {data,isLoading,isSuccess}] = useLazyLoadUserQuery();
+  useEffect(()=>{  
+    if(isAuthenticated && !!userDetails){
+      // @ts-ignore
+      tokenTigger();
+      // @ts-ignore
+      trigger();
+    navigate("/dashboard/account",{replace:true});
+    }
     if(userDetails && isAuthenticated){
       navigate("/dashboard/account",{replace:true});
     }
-
-  },[userDetails,isAuthenticated])
+  },[isAuthenticated && !!userDetails])
   return (
     <>
       <div className="flex w-full 2xl:items-center flex-col">

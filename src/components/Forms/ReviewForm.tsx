@@ -1,5 +1,6 @@
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { FaRegStarHalfStroke } from "react-icons/fa6";
+// @ts-ignore
 import ReactStars from "react-rating-stars-component";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";

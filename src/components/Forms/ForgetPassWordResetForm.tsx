@@ -25,6 +25,7 @@ import { useForgetPasswordChangeMutation } from "@/redux/features/auth/authApi";
 import { useEffect, useRef, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { RootState } from "@/redux/store";
+import useOtpCounter from "@/hooks/useOtpTimeCounter";
 const formSchema = z.object({
     newPassword: z.string().min(2, { message: "Insert NewPassword or letter more than 2" }),
     confirmPassword: z.string().min(2, { message: "Insert NewPassword or letter more than 2" }),
@@ -39,7 +40,7 @@ const formSchema = z.object({
     }
 });
 const ForgetPassWordResetForm = () => {
-    const timerRef = useRef<HTMLSpanElement |undefined>(null)
+    const timerRef = useRef<HTMLSpanElement>();
     const navigate = useNavigate();
     const { forgetToken } = useSelector((state: RootState) => state.auth);
     const [resetPassword, { isLoading, isError, error, isSuccess, data }] = useForgetPasswordChangeMutation()
@@ -56,7 +57,7 @@ const ForgetPassWordResetForm = () => {
         },
 
     });
-    async function onSubmit(values: z.infer<typeof formSchema>) {
+    async function onSubmit(values: z.infer<typeof formSchema>) {    
         await resetPassword({ forgetToken, ...values });
     }
     useEffect(() => {
@@ -75,22 +76,13 @@ const ForgetPassWordResetForm = () => {
             }
         }
     }, [isSuccess, isError, data, error])
-    let timeleft =localStorage.getItem("otpCode") && JSON.parse(localStorage.getItem("otpCode")) || 300
-    let downloadTimer:NodeJS.Timeout | undefined;
-    function startTimer() {
-        downloadTimer = setInterval(function () {
-            if (timeleft <= 0) {
-                clearInterval(downloadTimer);
-                console.log("OTP timer finished!");
-            }
-            const minutes = Math.floor(timeleft / 60);
-            const seconds = timeleft % 60;
-            timerRef.current.innerHTML = `${minutes}:${seconds}`;
-            timeleft--;
-            localStorage.setItem("otpCode",JSON.stringify(timeleft));
-        }, 1000);
-    }
-    startTimer();
+    useEffect(()=>{
+        if(!localStorage.getItem("forgetPassword")){
+            navigate("/customer/account/forgetPassword",{replace:true});
+        }        
+    },[localStorage])
+    
+   const {timeleft,handleResend} = useOtpCounter({timerRef});
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className=" w-full space-y-8">
@@ -163,9 +155,9 @@ const ForgetPassWordResetForm = () => {
                                 </InputOTP>
                             </FormControl>
                             <FormDescription className="font-semibold text-gray-900">
-                                Didn't Get the OTP ? {timeleft < -1 ? "Resend" :
+                                Didn't Get the OTP ? {timeleft <= 0 ? <Button type="button" className="font-bold px-1 py-0" onClick={handleResend} variant={"link"}>Resend</Button> :
                                 <>
-                                    Resend in <span className="text-[16px] text-black font-semibold" ref={timerRef}></span>
+                                    Resend in <span ref={timerRef} className="text-[16px] text-black font-semibold">00:00</span>
                                 </> }
                             </FormDescription>
                             <FormMessage />

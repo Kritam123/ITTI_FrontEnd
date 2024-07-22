@@ -39,7 +39,7 @@ const ForgetPassWordLinkSentForm = () => {
         if (isSuccess) {
             const message = data.message || `PassWord Reset Link Is In ${form?.getValues()?.email} Email`;
             toast.success(message);
-            navigate(`/customer/account/setnewPassword?email${form?.getValues().email}`);
+            navigate(`/customer/account/setnewPassword?email=${form?.getValues().email}`);
         }
         if (isError && error) {
             console.log(error)

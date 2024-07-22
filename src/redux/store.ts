@@ -11,13 +11,12 @@ export const store = configureStore({
   devTools:false,
   middleware:(getDefaultMiddleware)=>getDefaultMiddleware().concat(apiSlice.middleware),
 })
-console.log(store.getState().auth.isAuthenticated)
-console.log(store.getState().auth.userDetails)
 
   const initialApp = async()=>{
     await store.dispatch(apiSlice.endpoints.refreshToken.initiate({},{forceRefetch:true}));
   }
-  
+
+
     initialApp();
 
 

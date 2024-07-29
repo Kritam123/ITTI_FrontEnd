@@ -8,7 +8,6 @@ import { toast } from "sonner";
    const [createOtpCode,{isError,error,isSuccess,data}]  = useForgetPasswordOtpMutation();
    const handleResend = async()=>{
     let email = params.get("email")
-    console.log(email)
     await createOtpCode({email})
     setTimeLeft(300);
    }

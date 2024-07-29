@@ -1,9 +1,8 @@
 // packages all
 import { useSelector } from "react-redux";
-import { useLazyLoadUserQuery, useLazyRefreshTokenQuery, useLoadUserQuery } from "./redux/features/api/apiSlice"
+import { useLazyLoadUserQuery, useLazyRefreshTokenQuery } from "./redux/features/api/apiSlice"
 import { RootState } from "./redux/store"
-
-import { Route, Routes, useNavigate } from "react-router-dom"
+import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 // components all
 import TopNavbar from "@/components/CommonComponents/TopNavbar"
 import Navbar from "@/components/CommonComponents/Navbar"
@@ -16,33 +15,44 @@ import { LoadingScreen } from "./components/CommonComponents/LoadingScreen"
 import Footer from "./components/CommonComponents/Footer"
 // pages all
 
-import React, { lazy, Suspense, useEffect } from "react"
-import {  useCookies } from "react-cookie";
-
+import { lazy, Suspense, useEffect } from "react"
+// @ts-ignore
+import Cookies from "js-cookie"
 function App() {
-  const navigate = useNavigate();
-  const [cookies] = useCookies(['refreshToken','accessToken']);
-  console.log(cookies['accessToken'],cookies['refreshToken'])
   const { userDetails, isAuthenticated } = useSelector((state: RootState) => state.auth);
-  // const { data, isLoading, isSuccess } = useLoadUserQuery("getUser", { skip: false });
-  const [tokenTigger] = useLazyRefreshTokenQuery();
-  const [trigger, {data,isLoading,isSuccess}] = useLazyLoadUserQuery();
-  useEffect(()=>{  
-    if(isAuthenticated && !!userDetails){
+  const [tokenTigger, { isFetching }] = useLazyRefreshTokenQuery();
+  const [trigger, { isLoading }] = useLazyLoadUserQuery();
+
+  useEffect(() => {
+    if (Cookies.get('refreshToken')) {
       // @ts-ignore
       tokenTigger();
       // @ts-ignore
       trigger();
-    navigate("/dashboard/account",{replace:true});
+      localStorage.removeItem("token");
+      window.scrollTo(0, 0);
     }
-    if(userDetails && isAuthenticated){
-      navigate("/dashboard/account",{replace:true});
+    else {
+      if (JSON.parse(localStorage.getItem("token")!)) {
+        Cookies.set("refreshToken", JSON.parse(localStorage.getItem("token")!));
+        // @ts-ignore
+        tokenTigger().then(async () => {
+          // @ts-ignore
+          await trigger();
+        }).then(()=>{
+          localStorage.removeItem("token");
+        })
+      }
     }
-  },[isAuthenticated && !!userDetails])
+  }, [])
+
+window.onbeforeunload = ()=>{
+  localStorage.setItem("token", JSON.stringify(Cookies?.get('refreshToken') || ""));
+}
   return (
     <>
       <div className="flex w-full 2xl:items-center flex-col">
-        <TopNavbar isAuthenticated={isSuccess} currentUser={userDetails} loading={isLoading} />
+        <TopNavbar isAuthenticated={isAuthenticated} currentUser={userDetails} loading={isFetching || isLoading} />
         <Navbar />
         <BottomNavbar />
       </div>
@@ -57,67 +67,52 @@ function App() {
 
 
         {/* dashboard rotues */}
-
-        <>
-          <Route path="/dashboard/account" element={<div className="flex px-10 w-full  py-10 ">
-            <ProtectRoute data={data} isSuccess={isSuccess} isLoading={isLoading}>
+        {
+          <Route element={<ProtectedRoute  isAuthenticated={isAuthenticated}/>}>
+            <Route path="/dashboard/account" element={<div className="flex px-10 w-full  py-10 ">
               <DashboardSideBar />
               <UserAccount />
-            </ProtectRoute>
-          </div>} />
-          <Route path="/dashboard/order" element={<div className="flex px-10 py-10 ">
-            <ProtectRoute data={data} isSuccess={isSuccess} isLoading={isLoading}>
+            </div>} />
+            <Route path="/dashboard/order" element={<div className="flex px-10 py-10 ">
               <DashboardSideBar />
               <UserOrdersList />
-            </ProtectRoute>
-          </div>} />
-          <Route path="/dashboard/wishlist" element={<div className="flex px-10 py-10 ">
-            <ProtectRoute data={data} isSuccess={isSuccess} isLoading={isLoading}>
+            </div>} />
+            <Route path="/dashboard/wishlist" element={<div className="flex px-10 py-10 ">
               <DashboardSideBar />
               <UserFavList />
-            </ProtectRoute>
 
-          </div>} />
-          <Route path="/dashboard/address" element={<div className="flex px-10 py-10 ">
-            <ProtectRoute data={data} isSuccess={isSuccess} isLoading={isLoading}>
+            </div>} />
+            <Route path="/dashboard/address" element={<div className="flex px-10 py-10 ">
               <DashboardSideBar />
               <UserAddress />
-            </ProtectRoute>
 
-          </div>} />
-          <Route path="/dashboard/account/edit" element={<div className="flex px-10 py-10">
-            <ProtectRoute data={data} isSuccess={isSuccess} isLoading={isLoading}>
+            </div>} />
+            <Route path="/dashboard/account/edit" element={<div className="flex px-10 py-10">
               <DashboardSideBar />
               <UserAccountEdit />
-            </ProtectRoute>
 
-          </div>} />
-          <Route path="/dashboard/review" element={<div className="flex px-10 py-10">
-            <ProtectRoute data={data} isSuccess={isSuccess} isLoading={isLoading}>
+            </div>} />
+            <Route path="/dashboard/review" element={<div className="flex px-10 py-10">
               <DashboardSideBar />
               <UserProductReviews />
-            </ProtectRoute>
 
-          </div>} />
-          <Route path="/dashboard/address/edit/:addressId" element={<div className="flex px-10 gap-5 py-10">
-            <ProtectRoute data={data} isSuccess={isSuccess} isLoading={isLoading}>
+            </div>} />
+            <Route path="/dashboard/address/edit/:addressId" element={<div className="flex px-10 gap-5 py-10">
               <DashboardSideBar />
               <UserAddressEditById />
-            </ProtectRoute>
 
-          </div>} />
-        </>
-
-
+            </div>} />
+          </Route>
+        }
         <Route path="*" element={<NotFoundPage />} />
         {/* auth routes */}
-        {!isAuthenticated &&
-          <>
+        {
+          <Route element={<AuthRoute isAuthenticated={isAuthenticated} />}> 
             <Route path="/customer/account/login" element={<AuthLogin />} />
             <Route path="/customer/account/create" element={<AuthRegister />} />
-            <Route path = "/customer/account/forgetPassword" element= {<ForgetPassWord/>}/>
-            <Route path = "/customer/account/setnewPassword/" element= {<ForgetPasswordReset/>}/>
-          </>
+            <Route path="/customer/account/forgetPassword" element={<ForgetPassWord />} />
+            <Route path="/customer/account/setnewPassword/" element={<ForgetPasswordReset />} />
+          </Route>
         }
       </Routes>
       <Footer />
@@ -128,31 +123,6 @@ function App() {
 export default App
 
 
-const ProtectRoute = ({ children, data, isSuccess, isLoading }: { children: React.ReactNode, data: any, isSuccess: boolean, isLoading: boolean }) => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!data && !isSuccess && !isLoading) {
-      return navigate("/", { replace: true });
-    }
-    
-  }, [data, isSuccess, isLoading])
-  if (!data && !isSuccess && isLoading) {
-    return (
-      <>
-        <div className="flex justify-center items-center w-full min-h-screen">
-          <div className="loader"></div>
-        </div>
-      </>
-    )
-  }
-  return (
-    <>
-      {children}
-    </>
-  )
-}
-
 const Loadable = (Component: any) => (props: any) => {
   return (
     <Suspense fallback={<LoadingScreen />}>
@@ -161,9 +131,14 @@ const Loadable = (Component: any) => (props: any) => {
   );
 };
 
-
+const AuthRoute = ({isAuthenticated}:{isAuthenticated:boolean}) => {
+  return !Cookies.get('refreshToken') && !isAuthenticated  ? <Outlet /> : <Navigate to="/dashboard/account" />
+}
+const ProtectedRoute = ({isAuthenticated}:{isAuthenticated:boolean}) => {
+  return Cookies.get('refreshToken') && isAuthenticated  ? <Outlet /> : <Navigate to="/customer/account/login" />
+}
 const Home = Loadable(lazy(() => import("./pages/Home")));
-const ForgetPassWord = Loadable(lazy(()=>import("./pages/ForgetPassWord")));
+const ForgetPassWord = Loadable(lazy(() => import("./pages/ForgetPassWord")));
 const AuthLogin = Loadable(lazy(() => import("./pages/AuthLogin")));
 const AuthRegister = Loadable(lazy(() => import("./pages/AuthRegister")));
 const UserAccount = Loadable(lazy(() => import("./pages/UserAccount")));
@@ -177,7 +152,7 @@ const CompareProducts = Loadable(lazy(() => import("./pages/CompareProducts")));
 const ProductDetails = Loadable(lazy(() => import("./pages/ProductDetails")));
 const ProductsSearch = Loadable(lazy(() => import("./pages/ProductsSearch")));
 const UserAddressEditById = Loadable(lazy(() => import("./pages/UserAddressEditById")))
-const ForgetPasswordReset = Loadable(lazy(()=>import("./pages/ForgetPasswordReset"))) 
+const ForgetPasswordReset = Loadable(lazy(() => import("./pages/ForgetPasswordReset")))
 
 // import ProductDetails from "./pages/ProductDetails"
 // import ProductsSearch from "./pages/ProductsSearch"

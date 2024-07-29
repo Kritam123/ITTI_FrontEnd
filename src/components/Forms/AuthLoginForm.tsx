@@ -14,11 +14,9 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { toast } from "sonner";
-import { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
 const formSchema = z.object({
     email: z.string().min(2, { message: "Email Required!" }).email({ message: "Please give proper email" }),
     password: z.string().min(2, {
@@ -28,8 +26,9 @@ const formSchema = z.object({
 })
 
 const AuthLoginForm = () => {
-    const [login, { isLoading, data, error, isError, isSuccess }] = useLoginMutation();
-    const [show, setShow] = useState(false)
+    const navigate =  useNavigate();
+    const [login,{isError,isLoading,data,error}] = useLoginMutation();
+    const [show, setShow] = useState(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -39,17 +38,22 @@ const AuthLoginForm = () => {
 
     });
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        await login(values);
+        try {
+           const response = await login(values).unwrap();    
+           if(response){
+            navigate("/dashboard/account",{replace:true})
+            const message = data?.message || "Logged In Successfully";
+            toast.success(message);
+           }
+        }
+        catch(error) {
+            console.log(error)
+        }
     }
     useEffect(() => {
-        if (isSuccess) {
-            const message = data.message || "Logged In Successfully";
-            toast.success(message);
-        }
+       
         if (isError && error) {
-            console.log(error)
             if ("data" in error) {
-
                 const errorData = error.data as any;
                 toast.error(errorData.errors || "Error Occured!");
             } else {
@@ -57,8 +61,7 @@ const AuthLoginForm = () => {
                 toast.error("Something went Wrong");
             }
         }
-    }, [isSuccess, isError, data, error])
-
+    }, [ isError, data, error])
     return (
         <div className="mt-10">
             <Form {...form}>

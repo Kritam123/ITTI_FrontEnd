@@ -46,7 +46,6 @@ const DashboardSideBar = () => {
   useEffect(() => {
     setActiveLink(pathname);
   }, [pathname])
-  
   return (
     <div className="w-[20%]">
       <ul className="space-y-1">

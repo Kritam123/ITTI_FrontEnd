@@ -1,9 +1,12 @@
 import { apiSlice } from "../api/apiSlice";
-import { userDeleteForgetToken, userDetails, userForgetToken, userLoggedIn, userLoggedOut, userRegistration } from "./authSlice";
+import { userDeleteForgetToken, userDetails, userForgetToken, userLoggedIn, userLoggedOut } from "./authSlice";
 type Response ={
     message:string,
-    refreshToken:string,
-    isAuthenticated:boolean
+    data:{
+        refreshToken:string,
+        isAuthenticated:boolean
+        loggedUser:undefined | UserDetailsProps
+    }
 }
 type LoginData = {
     password:string,
@@ -19,17 +22,7 @@ export const authApi = apiSlice.injectEndpoints({
                 body:data,
                 credentials:"include" as const,
             }),
-            async onQueryStarted(_,{queryFulfilled,dispatch} ) {
-                try {
-                    const result = await queryFulfilled;
-                    dispatch(userRegistration({
-                        refreshToken:result.data.refreshToken,
-                        isAuthenticated:result.data.isAuthenticated
-                    }))
-                } catch (error:any) {
-                    console.log(error);
-                }
-            }
+           
         }),
         login:builder.mutation<Response,LoginData>({
             query:({email,password})=>({
@@ -38,14 +31,12 @@ export const authApi = apiSlice.injectEndpoints({
                 body:{email,password},
                 credentials:"include" as const
             }),
-            invalidatesTags:["getUser"],
+        invalidatesTags:["getUser"],
             async onQueryStarted(_, {queryFulfilled,dispatch}) {
                 const result = await queryFulfilled;
                 dispatch(userLoggedIn({
-                    refreshToken:result.data.refreshToken,
-                    // @ts-ignore
+                    refreshToken:result.data.data.refreshToken,
                     isAuthenticated:result.data.data.isAuthenticated,
-                    // @ts-ignore
                     user:result.data.data.loggedUser
                 }))
             }
@@ -82,7 +73,6 @@ export const authApi = apiSlice.injectEndpoints({
                 method:"POST",
                 credentials:"include"as const
             }) ,
-            invalidatesTags:["getUser"],
             async onQueryStarted(_, {dispatch}) {
                try {
                 dispatch(userLoggedOut())
@@ -94,7 +84,7 @@ export const authApi = apiSlice.injectEndpoints({
         }),
         socialAuth:builder.mutation({
             query:({email,firstName,lastName})=>({
-                url:"user/socialAuth/",
+                url:"user/socialAuth",
                 method:"POST",
                 body:{email,firstName,lastName},
                 credentials:"include" as const

@@ -9,8 +9,9 @@ export const apiSlice = createApi({
   tagTypes:["getUser","getUserAddress","getUserAddressById"],
   endpoints: (builder) => ({
     refreshToken: builder.query({
-      query: () => ({
+      query: (tokenRefresh) => ({
         url: "user/accessTokenRefresh",
+        body:tokenRefresh,
         method: "POST",
         credentials: "include" as const,
       }),

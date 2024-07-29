@@ -29,4 +29,6 @@ interface UserDetailsProps {
     lastName:string,
     email:string,
     addresses:[],
+    _id:String,
+    refreshToken:string
 }

@@ -1,4 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+// @ts-ignore
+import Cookies from "js-cookie";
 interface UserResponseProps {
     refreshToken: string,
     forgetToken: string,
@@ -19,30 +21,33 @@ const authSlice = createSlice({
             state.refreshToken = action.payload.refreshToken;
             state.isAuthenticated = action.payload.isAuthenticated
         },
-        userLoggedIn: (state, action: PayloadAction<{ refreshToken: string, isAuthenticated: boolean,user:UserDetailsProps}>) => {
+        userLoggedIn: (state, action: PayloadAction<{ refreshToken: string, isAuthenticated: boolean,user:UserDetailsProps |undefined}>) => {
             state.refreshToken = action.payload.refreshToken;
-            state.isAuthenticated = action.payload.isAuthenticated;
-            state.userDetails = action.payload.user
+            state.isAuthenticated = action.payload.isAuthenticated,
+            state.userDetails = action.payload.user,
+            Cookies.set("refreshToken",state.refreshToken)
         },
         userForgetToken: (state, action: PayloadAction<{ forgetPasswordToken: string }>) => {
             state.forgetToken = action.payload.forgetPasswordToken,
-                localStorage.setItem("forgetPassword", JSON.stringify(action.payload.forgetPasswordToken));
+            localStorage.setItem("forgetPassword", JSON.stringify(action.payload.forgetPasswordToken));
         },
         userDeleteForgetToken: (state) => {
             state.forgetToken = "",
-                localStorage.removeItem("forgetPassword");
+            localStorage.removeItem("forgetPassword");
         },
         userDetails: (state, action: PayloadAction<{ refreshToken: string, isAuthenticated: boolean, user: UserDetailsProps }>) => {
-            state.refreshToken = action.payload.refreshToken,
+                state.refreshToken = action.payload.refreshToken,
                 state.isAuthenticated = action.payload.isAuthenticated,
                 state.userDetails = action.payload.user
         },
+       
         userLoggedOut: (state) => {
             state.refreshToken = "";
             state.isAuthenticated = false;
-            state.userDetails = undefined
+            state.userDetails = undefined,
+             localStorage.removeItem("token")
         }
     }
 });
-export const { userRegistration, userLoggedIn, userLoggedOut, userDetails, userForgetToken, userDeleteForgetToken } = authSlice.actions;
+export const { userRegistration, userLoggedIn,userLoggedOut, userDetails, userForgetToken, userDeleteForgetToken } = authSlice.actions;
 export default authSlice.reducer;

@@ -8,8 +8,10 @@ import {
 import { FaPlus, FaMinus, FaRegHeart } from "react-icons/fa";
 import { FcInTransit } from "react-icons/fc";
 import { IoIosHelpCircleOutline } from "react-icons/io";
+// @ts-ignore
 import ReactImageMagnify from "react-image-magnify";
 import { Button } from "./ui/button";
+// @ts-ignore
 import ReactStars from "react-rating-stars-component";
 import { FaRegStar } from "react-icons/fa";
 import { FaStar, FaRegStarHalfStroke } from "react-icons/fa6";
@@ -45,7 +47,7 @@ const ProductInfo = () => {
           <CarouselNext className="bg-black text-white rounded-md" />
         </Carousel>
         {/* preview */}
-        <div className="flex-1 bg-white z-20">
+        <div className="flex-1 h-full flex items-center bg-white z-20">
           <ReactImageMagnify
           className="bg-white z-50"
             {...{
@@ -59,19 +61,18 @@ const ProductInfo = () => {
               },
               largeImage: {
                 src: previewImage,
-                width: 1200,
-                height: 1800,
+                width: 1920,
+                height: 1475,
 
               },
               enlargedImageContainerDimensions: {
-                width: '100%',
+                width: '200%',
                 height: '150%'
             },
               enlargedImageStyle: {
-                width: "100%",
-                // scale:"2",
+                width:"100%",
+                height:"100%",
                 "object-fit":"cover",
-                height: "100%",
               },
                 
           

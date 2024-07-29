@@ -5,15 +5,14 @@ import axios from "axios";
 import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { useNavigate } from "react-router-dom";
 interface SocialAuthProps {
   title:string,
   handleClick?:()=>void;
 }
 const SocialAuth = ({title}:SocialAuthProps) => {
- const [socialAuth,{isError,isSuccess,data,error}] =   useSocialAuthMutation();
- const {isAuthenticated} = useSelector((state:RootState)=>state.auth)
+  const navigate =  useNavigate();
+ const [socialAuth,{isError,error,data}] =   useSocialAuthMutation();
   const login = useGoogleLogin({
     onSuccess:async(response)=>{
         try {
@@ -22,13 +21,17 @@ const SocialAuth = ({title}:SocialAuthProps) => {
               Authorization:`Bearer ${response.access_token}`
             }
           })
-          console.log(res.data);
           const data = {
             email:res.data.email,
             firstName:res.data.given_name,
             lastName:res.data.family_name
           }
-          await socialAuth(data);
+         const result = await socialAuth(data).unwrap();
+         if(result){
+          navigate("/dashboard/account",{replace:true})
+          const message = result?.message || "Logged In Successfully";
+          toast.success(message);
+         }
         } catch (error) {
           console.log(error)
         }
@@ -36,14 +39,9 @@ const SocialAuth = ({title}:SocialAuthProps) => {
   });
  
   useEffect(() => {
-    if (isSuccess || isAuthenticated) {
-        const message = data.message || "Logged In Successfully";
-        toast.success(message);
-    }
-    if (isError && error) {
-        console.log(error)
-        if ("data" in error) {
 
+    if (isError && error) {
+        if ("data" in error) {
             const errorData = error.data as any;
             toast.error(errorData.errors || "Error Occured!");
         } else {
@@ -51,7 +49,7 @@ const SocialAuth = ({title}:SocialAuthProps) => {
             toast.error("Something went Wrong");
         }
     }
-}, [isSuccess, isError, data, error,isAuthenticated])
+}, [ isError, data, error])
    
   return (
     <div className="mt-6">

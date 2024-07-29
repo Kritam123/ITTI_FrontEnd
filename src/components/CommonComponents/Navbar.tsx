@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/card";
 import Icons from "@/lib/Icons";
 import MobileNavbar from "./MobileComponents/MobileNavbar";
-import { useState } from "react";
+import {  useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CompareDrawer } from "../Drawer";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
@@ -25,16 +25,18 @@ import PopoverCartItem from "./PopoverCartItem";
 import { cn } from "@/lib/utils";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import queryString from "query-string"
 const Navbar = () => {
  const {isAuthenticated} =  useSelector((state:RootState)=>state.auth);
   
   const [isToggle, setIsToggle] = useState<boolean>(false);
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useState("");
+  const [search,setSearch] = useState("")
   const [open, setOpen] = useState(false);
   const handleSearch = () => {
-    navigate(`/search/result?query=${searchParams}`);
+    navigate(`/search/result?${queryString.stringify({...queryString.parse(location.search),q:search})}`);
   };
+ 
   return (
     <nav className="w-full max-w-[1600px] flex relative px-3 min-[768px]:h-[110px] min-[1040px]:px-14 justify-between items-center h-[70px]  ">
       <CompareDrawer open={open} setOpen={setOpen} />
@@ -49,8 +51,8 @@ const Navbar = () => {
       {/* search */}
       <div className="flex-1 mx-5 max-w-[600px] relative min-[640px]:flex hidden">
         <Input
-          value={searchParams}
-          onChange={(e) => setSearchParams(e.target.value)}
+        value={search}
+        onChange={(e)=>setSearch(e.target.value)}
           placeholder="Enter keyword to Search.."
           className="outline-none  w-full ring-0 placeholder:text-md  border border-gray-400 focus-visible:ring-offset-0 focus-visible:ring-0"
         />

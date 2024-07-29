@@ -7,17 +7,13 @@ import { Provider } from 'react-redux';
 import { store } from './redux/store.ts'
 import { Toaster } from './components/ui/toaster.tsx'
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import {CookiesProvider} from "react-cookie"
  const clientId = import.meta.env.VITE_GOOGLE_CLIENTID
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={store}>
     <BrowserRouter>
     <GoogleOAuthProvider clientId={clientId}>
-    <CookiesProvider>
       <App />
-    </CookiesProvider>    
-
       </GoogleOAuthProvider>
     <Toaster/>
     </BrowserRouter>

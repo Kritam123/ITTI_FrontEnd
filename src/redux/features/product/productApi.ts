@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { filterProducts } from "./productSlice";
+import { filterProducts, getSingleProduct } from "./productSlice";
 
 const productApi = apiSlice.injectEndpoints({
     endpoints:(builder)=>({
@@ -22,8 +22,24 @@ const productApi = apiSlice.injectEndpoints({
                     console.log(error);
                 }
             }
+        }),
+        getProductBySlug:builder.query({
+            query:(slug)=>({
+                url:`/product/${slug}`,
+                method:"GET", 
+            }),
+            async onQueryStarted(_, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    dispatch(getSingleProduct({
+                       product:result.data.data.product
+                    }))
+                } catch (error: any) {
+                    console.log(error);
+                }
+            }
         })
     })
 })
 
-export const {useGetFilterProductsQuery,useLazyGetFilterProductsQuery} = productApi;
+export const {useGetFilterProductsQuery,useLazyGetFilterProductsQuery,useLazyGetProductBySlugQuery} = productApi;

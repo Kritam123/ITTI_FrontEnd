@@ -2,25 +2,25 @@ import Description from "./Description"
 import Reviews from "./Reviews"
 import Specifications from "./Specifications"
 
-const TabContains = ({ activeTab }: { activeTab: number }) => {
+const TabContains = ({ activeTab,descriptionProduct }: { activeTab: number,descriptionProduct:any }) => {
     return (
         <>
             {
                 (activeTab === 0) &&
                 <>
-                    <Specifications />
+                    <Specifications Specifications={descriptionProduct.specifications}/>
                 </>
             }
             {
                 activeTab === 1 &&
                 <>
-                    <Description />
+                    <Description description={descriptionProduct.description} />
                 </>
             }
             {
                 activeTab === 2 &&
                 <>
-                    <Reviews />
+                    <Reviews reviews = {descriptionProduct.reviews} />
                 </>
             }
         </>

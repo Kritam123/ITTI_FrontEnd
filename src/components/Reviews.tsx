@@ -1,10 +1,11 @@
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { FaRegStarHalfStroke } from "react-icons/fa6";
+// @ts-ignore
 import ReactStars from "react-rating-stars-component";
 import { Button } from "./ui/button";
 import Icons from "@/lib/utils/Icons";
 import ReviewForm from "./Forms/ReviewForm";
-const Reviews = () => {
+const Reviews = ({reviews}:{reviews:[]}) => {
     return (
         <div className="mt-8">
             {/* rating snapshot  and average customer reviews */}

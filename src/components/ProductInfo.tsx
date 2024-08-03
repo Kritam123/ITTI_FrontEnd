@@ -15,15 +15,21 @@ import { Button } from "./ui/button";
 import ReactStars from "react-rating-stars-component";
 import { FaRegStar } from "react-icons/fa";
 import { FaStar, FaRegStarHalfStroke } from "react-icons/fa6";
-import { useState } from "react";
+import {  useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { ProductImages } from "@/lib/utils/productsImages";
-const ProductInfo = () => {
+const ProductInfo = ({productDetails}:{productDetails:Product}) => {
   const [quantity, setQuantity] = useState<number>(1)
   const [active, setActive] = useState(0)
-  const [previewImage, setPreviewImage] = useState(ProductImages[0])
+  const [previewImage, setPreviewImage] = useState('');
+  const [largeImage,setLargeImage] = useState('');
+  useEffect(()=>{
+    if(productDetails.productImages){
+      setPreviewImage(productDetails.productImages[0].smallImgUrl);
+      setLargeImage(productDetails.productImages[0].previewImgUrl)
+    }
+  },[productDetails])
   return (
-    <div className="flex justify-between gap-5 mt-5 w-full">
+    <div className="flex justify-between gap-16 mt-5 w-full">
       {/* left side */}
       <div className="basis-[55%] min-h-[60vh] flex items-center justify-center  gap-10 ">
         {/* carousel preview */}
@@ -34,11 +40,11 @@ const ProductInfo = () => {
           orientation="vertical"
           className="  w-fit  mt-16 flex justify-center max-w-xs"
         >
-          <CarouselContent className=" h-[450px] ">
-            {ProductImages?.map((item, index) => (
-              <CarouselItem  key={index}  className="md:basis-20 cursor-pointer">
-                <div onClick={()=>{setPreviewImage(item),setActive(index)}} className={cn("p-1  border-2 w-24 flex items-center justify-center h-24  rounded-md",active === index ? "border-red-700": "")}>
-                  <img className="object-contain w-full h-full" src={item} alt="image_Preview" />
+          <CarouselContent className="h-[450px]  ">
+            {productDetails.productImages?.map((item, index) => (
+              <CarouselItem key={index} className="md:basis-20 cursor-pointer">
+                <div onClick={() => { setPreviewImage(item.smallImgUrl),setLargeImage(item.previewImgUrl), setActive(index) }} className={cn("p-1  border-2 w-28 flex items-center justify-center h-28  rounded-md", active === index ? "border-red-700" : "")}>
+                  <img className="object-contain w-full h-full" src={item.smallImgUrl} alt="image_Preview" />
                 </div>
               </CarouselItem>
             ))}
@@ -47,37 +53,37 @@ const ProductInfo = () => {
           <CarouselNext className="bg-black text-white rounded-md" />
         </Carousel>
         {/* preview */}
-        <div className="flex-1 h-full flex items-center bg-white z-20">
+        <div className="flex-1   flex h-full items-center bg-white z-20">
           <ReactImageMagnify
-          className="bg-white z-50"
+            className="bg-white z-50"
             {...{
               smallImage: {
                 alt: "Wristwatch by Ted Baker London",
-                width:300,
-                height:264,
+                width: 300,
+                height: 264,
                 isFluidWidth: true,
                 sizes: '(max-width: 480px) 100vw, (max-width: 1200px) 30vw, 360px',
                 src: previewImage,
               },
               largeImage: {
-                src: previewImage,
+                src: largeImage,
                 width: 1920,
                 height: 1475,
 
               },
               enlargedImageContainerDimensions: {
                 width: '200%',
-                height: '150%'
-            },
-              enlargedImageStyle: {
-                width:"100%",
-                height:"100%",
-                "object-fit":"cover",
+                height: '100%'
               },
-                
-          
+              enlargedImageStyle: {
+                width: "100%",
+                height: "100%",
+                "object-fit": "fit",
+              },
+
+
             }}
-            enlargedImageContainerClassName	="bg-white"
+            enlargedImageContainerClassName="bg-white"
             shouldUsePositiveSpaceLens
             isEnlargedImagePortalEnabledForTouch
 
@@ -86,7 +92,7 @@ const ProductInfo = () => {
         </div>
       </div>
       {/* right side */}
-      <div className="basis-[45%] space-y-5">
+      <div className="basis-[50%] space-y-5">
         {/* top */}
         <div className="flex">
           <Button className="bg-green-600 flex gap-2 hover:bg-green-600">
@@ -99,12 +105,13 @@ const ProductInfo = () => {
 
         </div>
         {/* productname */}
-        <p className=" text-wrap text-[22px] font-semibold text-gray-900">Lenovo ThinkBook 14 Gen 4 i5-1255U | 16GB RAM | 512GB SSD | 14" FHD Display | Backlight Keyboard | 1 Year Warranty</p>
+        <p className=" text-wrap text-[22px] font-semibold text-gray-900">{productDetails.title}</p>
         {/* rating */}
         <ReactStars
           count={5}
           size={20}
           isHalf={true}
+          value= {productDetails.rating}
           edit={false}
           emptyIcon={<FaRegStar className="text-gray-100" />}
           halfIcon={<FaStar />}
@@ -116,10 +123,10 @@ const ProductInfo = () => {
           <div className="flex gap-2">
             <span className="text-xl text-gray-800 font-semibold">Price:</span>
             <span className="before:absolute before:left-0 before:w-full before:h-[2px] before:top-1/2 before:bg-gray-400 flex relative text-xl font-semibold text-gray-400
-          ">रु 95,000
+          ">रु {productDetails.discountPrice}
             </span>
             <span className="text-xl font-semibold text-red-500">
-              रु 85,000</span>
+              रु {productDetails.price}</span>
           </div>
           <span className="text-green-700 font-semibold">In Stock</span>
         </div>
@@ -130,11 +137,11 @@ const ProductInfo = () => {
               Qty:
             </span>
             <div className="flex items-center justify-center gap-5">
-              <Button onClick={() => setQuantity(quantity === 1 ? 1 : quantity - 1)} size={"icon"} className={cn("w-fit px-3", quantity > 1 ? "bg-red-700 hover:bg-red-700" : "bg-red-400 hover:bg-red-400")} >
+              <Button disabled={quantity <=1} onClick={() => setQuantity(quantity === 1 ? 1 : quantity - 1)} size={"icon"} className={cn("w-fit px-3", quantity > 1 ? "bg-red-700 hover:bg-red-700" : "bg-red-400 hover:bg-red-400")} >
                 <FaMinus size={15} />
               </Button>
               <span className="text-black text-lg w-10 font-semibold flex justify-center items-center">{quantity}</span>
-              <Button onClick={() => setQuantity(quantity + 1)} className="bg-red-700 px-3 w-fit hover:bg-red-700">
+              <Button disabled={productDetails.quantity <=quantity} onClick={() => setQuantity(quantity + 1)} className="bg-red-700 px-3 w-fit hover:bg-red-700">
                 <FaPlus size={15} />
               </Button>
             </div>
@@ -152,13 +159,12 @@ const ProductInfo = () => {
         <div >
           <span className="font-semibold text-lg">Key Specification </span>
           <ul className="flex flex-col mt-3 list-disc gap-1">
-            <li><span className="font-semibold text-md">Model:</span>Lenovo ThinkBook 14 Gen 4</li>
-            <li><span className="font-semibold text-md">Processor:</span>Intel Core i5-1255U processor</li>
-            <li><span className="font-semibold text-md">RAM:</span>16GB DDR4 MAX upto 40GB</li>
-            <li><span className="font-semibold text-md">Storage: </span>512GB SSD</li>
-            <li><span className="font-semibold text-md">Display:</span>14" FHD (1920x1080) IPS 300nits</li>
-            <li><span className="font-semibold text-md">Graphic:</span> Integrated Intel® Iris® Xe Graphics</li>
-            <li><span className="font-semibold text-md">Warranty: </span> 1 Year Warranty</li>
+            {
+              productDetails.keySpecification?.map(({key,value},index)=>(
+                <li key={index}><span className="font-semibold text-md">{key}:</span>{value}</li>
+              ))
+            }
+            
           </ul>
         </div>
       </div>

@@ -6,6 +6,7 @@
 html{
   margin: 0;
   padding: 0;
+  scroll-behavior: smooth
 }
 @tailwind base;
   @tailwind components;
@@ -99,5 +100,46 @@ html{
     100% { transform: rotate(360deg); }
   }
 
-/* relative  before:absolute before:w-0 before:bottom-0 hover:before:w-full  before:bg-red-600 hover:before:delay-100  before:right-0  before:h-[1px]  hover:before:transition-all */
+  /* this css style for range in review  */
+  .slider {
+    -webkit-appearance: none; 
+    appearance: none;
+    width: 100%; 
+    height: 10px; 
+    background: #ddd; 
+    outline: none; 
+    opacity: 1; 
+    transition: opacity .15s ease-in-out; 
+  }
+
+  
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none; 
+    appearance: none;
+   
+  }
+
+  .slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    /* background: linear-gradient(to right, #e91a2b 1%, #ddd 0%);  */
+  }
+  /* .slider::-moz-range-track {
+    width: 100%;
+    height: 10px;
+    cursor: pointer;
+    background: #e91a2b;
+    border-radius: 5px;
+  } */
+  
+  /* Track Styles (IE) */
+  /* .slider::-ms-track {
+    width: 100%;
+  height: 15px;
+  cursor: pointer;
+  background: linear-gradient(to right, #FFD700 60%, #ddd 60%);
+  } */
   

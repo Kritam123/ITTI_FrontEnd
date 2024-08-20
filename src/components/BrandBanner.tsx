@@ -65,8 +65,7 @@ const BrandBanner = () => {
                     {
                         brandData && brandData.slice(0).map((item,i) => {
                             return (
-                                <div >
-                                   
+                                <div  key={i}>
                                         <img key={i} src={item?.image} className="w-[100px] h-[100px] cursor-pointer object-contain " />
                                 </div>
                             )
@@ -77,7 +76,7 @@ const BrandBanner = () => {
                     {
                         brandData && brandData.slice(6).map((item,i) => {
                             return (
-                                <div >
+                                <div key={i}>
                                    
                                         <img key={i} src={item?.image} className="w-[80px] cursor-pointer object-contain h-[100px]" />
                                 </div>
@@ -89,7 +88,7 @@ const BrandBanner = () => {
                     {
                         brandData && brandData.slice(0,6).map((item,i) => {
                             return (
-                                <button >
+                                <button key={i}>
                                    
                                         <img key={i} src={item?.image} className="w-[80px] cursor-pointer  object-contain h-[100px]" />
                                 </button>

@@ -5,7 +5,8 @@ interface FilterProductsProps {
     totalCount:number,
     pages:number,
     page:number,
-    product:{} | undefined
+    product:{} | Product,
+    review:{} | undefined
 }
 
 
@@ -14,7 +15,8 @@ let initialState:FilterProductsProps = {
     totalCount:0,
     page:1,
     pages:0,
-    product:{}
+    product:{},
+    review:{}
 }
 
 
@@ -28,13 +30,16 @@ const productSlice = createSlice({
             state.products = action.payload.products,
             state.totalCount = action.payload.totalCount
         },
-        getSingleProduct:(state,action:PayloadAction<{product:{}}>)=>{
+        getSingleProduct:(state,action:PayloadAction<{product:Product  | {}}>)=>{
             state.product = action.payload.product
+        },
+        ProductReview:(state,action:PayloadAction<{review:{}}>)=>{
+            state.review = action.payload.review
         }
     }
 })
 
 
 
-export const {filterProducts,getSingleProduct} =  productSlice.actions;
+export const {filterProducts,getSingleProduct,ProductReview} =  productSlice.actions;
 export default productSlice.reducer;

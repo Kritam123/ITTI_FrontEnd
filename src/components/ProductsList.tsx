@@ -6,7 +6,7 @@ const ProductsList = ({ products }: { products: Product[] }) => {
   return (
 
     <>{
-      products.length >= 1 ? <div className="py-3 grid min-[1100px]:grid-cols-3   gap-y-5 grid-cols-2 ">
+      products.length >= 1 ? <div className="py-3 grid grid-cols-2 gap-y-5  min-[1100px]:grid-cols-3 ">
         {
           products.map((item) => (
             <ProductItem product={item} />

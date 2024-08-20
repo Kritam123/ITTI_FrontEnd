@@ -54,6 +54,7 @@ interface ProductImage {
   }
   
   interface Product {
+    _id:string;
     title: string;
     category: string;
     rating: number;
@@ -67,3 +68,10 @@ interface ProductImage {
     description: string;
     reviews?: string[];
   }
+
+  interface ReivewProps {
+    name:string,email:string,
+    reviewText:string,
+    rating:number,
+    createdAt:Date
+}

@@ -1,7 +1,9 @@
-import { Input } from "./ui/input"
+import CategoryFilter from '@/components/CategoryFilter';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { X } from 'lucide-react';
 import 'rc-slider/assets/index.css';
-import { Button } from "./ui/button";
-import CategoryFilter from "./CategoryFilter";
 import { getTrackBackground, Range } from "react-range";
 interface FiltersProps {
   categories: [] | any,
@@ -11,17 +13,23 @@ interface FiltersProps {
   maxPrice: number
   setMaxPrice: (maxPrice: number) => void;
   handlePrice: () => void;
+  setOpen:(open:boolean)=>void
 }
 
-const FiltersBox = ({ categories, maxPrice, minPrice, handlePrice, setCategories, setMaxPrice, setMinPrice }: FiltersProps) => {
+const MobileCategoryFilter = ({ categories, maxPrice, minPrice, handlePrice, setCategories, setMaxPrice, setMinPrice,setOpen }: FiltersProps) => {
   const handleChange = (e: number[] | any) => {
     setMinPrice(e[0]),
       setMaxPrice(e[1])
   }
   return (
-    <div>
-      <h1 className="text-xl pl-5 mt-5 font-semibold">Filters</h1>
-      <div className="w-80 mt-10 rounded-md h-fit  shadow-lg p-1  shadow-slate-200">
+    <div className=''>
+     <div className='flex sticky top-0 bg-white shadow-sm p-3 z-[1000] justify-between items-center'>
+     <h1 className="text-xl pl-5 font-semibold">Filters</h1>
+      <Button variant={"outline"} size={"icon"} onClick={()=>setOpen(false)}>
+      <X className='cursor-pointer '/>
+      </Button>
+     </div>
+      <div className="w-full mt-10 rounded-md overflow-y-scroll h-fit shadow-lg p-1 min-h-[100vh]  shadow-slate-200">
         {/* price */}
         <div className="p-5 pb-0">
           <h1 className="font-semibold font-lg">Price</h1>
@@ -110,9 +118,9 @@ const FiltersBox = ({ categories, maxPrice, minPrice, handlePrice, setCategories
           {/* /catagory/ */}
       <CategoryFilter categories={categories} setCategories={setCategories} />
       </div>
-    
-    </div>
+      </div>
+     
   )
 }
 
-export default FiltersBox
+export default  MobileCategoryFilter

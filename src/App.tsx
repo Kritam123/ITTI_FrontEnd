@@ -132,10 +132,11 @@ const Loadable = (Component: any) => (props: any) => {
 };
 
 const AuthRoute = ({isAuthenticated}:{isAuthenticated:boolean}) => {
-  return !Cookies.get('refreshToken') && !isAuthenticated  ? <Outlet /> : <Navigate to="/dashboard/account" />
+
+  return !Cookies.get('refreshToken') || !isAuthenticated ? <Outlet /> : <Navigate to="/dashboard/account" />
 }
 const ProtectedRoute = ({isAuthenticated}:{isAuthenticated:boolean}) => {
-  return Cookies.get('refreshToken') && isAuthenticated  ? <Outlet /> : <Navigate to="/customer/account/login" />
+  return Cookies.get('refreshToken') || isAuthenticated  ? <Outlet /> : <Navigate to="/customer/account/login" />
 }
 const Home = Loadable(lazy(() => import("./pages/Home")));
 const ForgetPassWord = Loadable(lazy(() => import("./pages/ForgetPassWord")));

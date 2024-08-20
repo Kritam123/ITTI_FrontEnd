@@ -12,7 +12,7 @@ function DragDropUploader() {
   const handleChange = (file:UploaderFileProps) => {
     setFile(file);
   };
-  console.log(file);
+  // console.log(file);
   return (
     <div className="w-full">
         <FileUploader label="Drag and drop images here or click to browse for files(0/1 files selected)

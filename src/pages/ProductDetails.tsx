@@ -1,4 +1,5 @@
 
+import NotFoundPage from "@/components/CommonComponents/NotFoundPage"
 import ProductDescription from "@/components/ProductDescription"
 import ProductInfo from "@/components/ProductInfo"
 import Suggestions from "@/components/Suggestions"
@@ -10,7 +11,7 @@ import { useEffect } from "react"
 import { useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 const ProductDetails = () => {
-  const [fetchProductBySlug] = useLazyGetProductBySlugQuery();
+  const [fetchProductBySlug,{error,isError}] = useLazyGetProductBySlugQuery();
     const {name} =  useParams<string>();
     DynamicTitle(name);
     useEffect(() => {
@@ -19,9 +20,20 @@ const ProductDetails = () => {
     useEffect(()=>{
       fetchProductBySlug(name)
     },[name])
+    
     const {product} = useSelector((state:RootState)=>state.products)
     const {specifications,description,reviews} = product as Product;
     let descriptionProduct ={specifications,description,reviews};
+
+    if(error && isError) {
+      document.title = "404 | Page Not Found"
+      return (
+        <>
+        <NotFoundPage/>
+        </>
+      )
+    }  
+    
   return (
     <div className="min-h-[100vh] w-full px-10 py-5">
        <BreadCrumbHelper name={name}/>

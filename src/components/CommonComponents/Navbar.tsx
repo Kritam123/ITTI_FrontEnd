@@ -19,13 +19,14 @@ import Icons from "@/lib/Icons";
 import MobileNavbar from "./MobileComponents/MobileNavbar";
 import {  useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CompareDrawer } from "../Drawer";
+import { DrawerDialog } from "../Drawer";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import PopoverCartItem from "./PopoverCartItem";
 import { cn } from "@/lib/utils";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import queryString from "query-string"
+import DrawerComapre from "../DrawerComapre";
 const Navbar = () => {
  const {isAuthenticated} =  useSelector((state:RootState)=>state.auth);
   
@@ -39,7 +40,7 @@ const Navbar = () => {
  
   return (
     <nav className="w-full max-w-[1600px] flex relative px-3 min-[768px]:h-[110px] min-[1040px]:px-14 justify-between items-center h-[70px]  ">
-      <CompareDrawer open={open} setOpen={setOpen} />
+      <DrawerDialog isCompare={true} open={open} setOpen={setOpen} ><DrawerComapre  setOpen={setOpen}/></DrawerDialog>
       {/* logo */}
       <Link to={"/"} className="min-w-[100px] w-[100px]  min-[768px]:w-[150px]">
         <img

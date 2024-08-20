@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import CardProduct from "./CommonComponents/CardProduct";
 import { cn } from "@/lib/utils";
+import CarosuelProduct from "./CommonComponents/CarosuelProduct";
 
 const FeaturedProducts = () => {
     const responsive = {
@@ -44,29 +45,7 @@ const FeaturedProducts = () => {
         FEATURED PRODUCTS
             </h1>
             {/* carouselProduct */}
-            <Carousel
-                swipeable={false}
-                draggable={false}
-                slidesToSlide={5}
-                arrows
-                customDot={<CustomDots />}
-                renderButtonGroupOutside={true}
-                customLeftArrow={<CustomLeftArrow />}
-                customRightArrow={<CustomRightArrow />}
-                showDots={true}
-                ssr={true}
-                responsive={responsive}
-                renderDotsOutside={true}
-                transitionDuration={1000}
-                className="w-full h-[480px]"
-            >
-                <CardProduct />
-                <CardProduct />
-                <CardProduct />
-                <CardProduct />
-                <CardProduct />
-                <CardProduct />
-            </Carousel>
+            <CarosuelProduct/>
     </div>
   )
 }

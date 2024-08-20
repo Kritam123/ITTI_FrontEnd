@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { filterProducts, getSingleProduct } from "./productSlice";
+import { filterProducts, getSingleProduct, ProductReview } from "./productSlice";
 
 const productApi = apiSlice.injectEndpoints({
     endpoints:(builder)=>({
@@ -38,8 +38,27 @@ const productApi = apiSlice.injectEndpoints({
                     console.log(error);
                 }
             }
+        }),
+        createReivew:builder.mutation({
+            query:({productId,...data})=>({
+                url:`/product/${productId}/review/create`,
+                method:"POST",
+                body:data,
+                credentials:"include"
+            }),
+            async onQueryStarted(_, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    dispatch(ProductReview({
+                       review:result.data.data.newReview
+                    }))
+                } catch (error: any) {
+                    console.log(error);
+                }
+            }
         })
+        
     })
 })
 
-export const {useGetFilterProductsQuery,useLazyGetFilterProductsQuery,useLazyGetProductBySlugQuery} = productApi;
+export const {useGetFilterProductsQuery,useLazyGetFilterProductsQuery,useLazyGetProductBySlugQuery,useCreateReivewMutation} = productApi;

@@ -7,11 +7,13 @@ import Advertisment from "@/components/Advertisment";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import Accessories from "@/components/Accessories";
 import AppDetails from "@/components/AppDetails";
+import { DynamicTitle } from "@/lib/utils/DynamicTitle";
 const Home = () => {
+  DynamicTitle("ITTI Computer World - Best Place for Shopping.");
   return (
     <div className=" flex flex-col  items-center w-full min-h-[100vh]">
         <ProductBanner/>
-        <BrandBanner/>
+        {/* <BrandBanner/> */}
         <DealofDay/>
         <FeatureCategory/>
         <BestSelling/>
@@ -22,5 +24,4 @@ const Home = () => {
     </div>
   )
 }
-
 export default Home

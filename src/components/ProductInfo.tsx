@@ -15,19 +15,35 @@ import { Button } from "./ui/button";
 import ReactStars from "react-rating-stars-component";
 import { FaRegStar } from "react-icons/fa";
 import { FaStar, FaRegStarHalfStroke } from "react-icons/fa6";
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-const ProductInfo = ({productDetails}:{productDetails:Product}) => {
-  const [quantity, setQuantity] = useState<number>(1)
+interface ReivewProps {
+  name: string, email: string,
+  reviewText: string,
+  rating: number
+}
+const ProductInfo = ({ productDetails }: { productDetails: Product | any }) => {
+  const [quantity, setQuantity] = useState<number>(1);
   const [active, setActive] = useState(0)
   const [previewImage, setPreviewImage] = useState('');
-  const [largeImage,setLargeImage] = useState('');
-  useEffect(()=>{
-    if(productDetails.productImages){
+  const [largeImage, setLargeImage] = useState('');
+  const [rating, setRating] = useState<number>( 0 );
+  function calculateAverageRating() {
+    if (!productDetails.reviews || productDetails.reviews.length === 0) return 0;
+    const totalRating = productDetails.reviews.reduce((sum: number, review:ReivewProps ) => sum + review.rating, 0);
+     let averageRating = Math.floor(totalRating / productDetails.reviews.length);
+    return averageRating;
+  }
+  useEffect(() => {
+    if (productDetails.productImages) {
       setPreviewImage(productDetails.productImages[0].smallImgUrl);
-      setLargeImage(productDetails.productImages[0].previewImgUrl)
+      setLargeImage(productDetails.productImages[0].previewImgUrl);
     }
-  },[productDetails])
+    if(productDetails.reviews?.length >1 && productDetails.reviews){
+      const rating  = calculateAverageRating();
+      setRating(rating);
+    }
+  }, [productDetails,rating])
   return (
     <div className="flex justify-between gap-16 mt-5 w-full">
       {/* left side */}
@@ -41,9 +57,9 @@ const ProductInfo = ({productDetails}:{productDetails:Product}) => {
           className="  w-fit  mt-16 flex justify-center max-w-xs"
         >
           <CarouselContent className="h-[450px]  ">
-            {productDetails.productImages?.map((item, index) => (
+            {productDetails.productImages?.map((item: any, index: number) => (
               <CarouselItem key={index} className="md:basis-20 cursor-pointer">
-                <div onClick={() => { setPreviewImage(item.smallImgUrl),setLargeImage(item.previewImgUrl), setActive(index) }} className={cn("p-1  border-2 w-28 flex items-center justify-center h-28  rounded-md", active === index ? "border-red-700" : "")}>
+                <div onClick={() => { setPreviewImage(item.smallImgUrl), setLargeImage(item.previewImgUrl), setActive(index) }} className={cn("p-1  border-2 w-28 flex items-center justify-center h-28  rounded-md", active === index ? "border-red-700" : "")}>
                   <img className="object-contain w-full h-full" src={item.smallImgUrl} alt="image_Preview" />
                 </div>
               </CarouselItem>
@@ -53,7 +69,7 @@ const ProductInfo = ({productDetails}:{productDetails:Product}) => {
           <CarouselNext className="bg-black text-white rounded-md" />
         </Carousel>
         {/* preview */}
-        <div className="flex-1   flex h-full items-center bg-white z-20">
+        <div className="flex-1 self-baseline w-full h-full mt-16 bg-white z-20">
           <ReactImageMagnify
             className="bg-white z-50"
             {...{
@@ -73,7 +89,7 @@ const ProductInfo = ({productDetails}:{productDetails:Product}) => {
               },
               enlargedImageContainerDimensions: {
                 width: '200%',
-                height: '100%'
+                height: '150%'
               },
               enlargedImageStyle: {
                 width: "100%",
@@ -92,7 +108,7 @@ const ProductInfo = ({productDetails}:{productDetails:Product}) => {
         </div>
       </div>
       {/* right side */}
-      <div className="basis-[50%] space-y-5">
+      <div className="basis-[45%] space-y-5">
         {/* top */}
         <div className="flex">
           <Button className="bg-green-600 flex gap-2 hover:bg-green-600">
@@ -111,10 +127,10 @@ const ProductInfo = ({productDetails}:{productDetails:Product}) => {
           count={5}
           size={20}
           isHalf={true}
-          value= {productDetails.rating}
+          value={calculateAverageRating() | rating}
           edit={false}
-          emptyIcon={<FaRegStar className="text-gray-100" />}
-          halfIcon={<FaStar />}
+          emptyIcon={<FaRegStar color="bg-gray-100" />}
+          halfIcon={<FaStar color="text-gray-100" />}
           fullIcon={<FaRegStarHalfStroke />}
           activeColor="#FFDE59"
         />
@@ -128,7 +144,7 @@ const ProductInfo = ({productDetails}:{productDetails:Product}) => {
             <span className="text-xl font-semibold text-red-500">
               रु {productDetails.price}</span>
           </div>
-          <span className="text-green-700 font-semibold">In Stock</span>
+          <span className={cn("text-green-700 font-semibold", productDetails.quantity < 1 && "text-red-700")}>{productDetails.quantity > 1 ? "In Stock" : "Out of Stock"}</span>
         </div>
         {/* quantity */}
         <div>
@@ -137,11 +153,11 @@ const ProductInfo = ({productDetails}:{productDetails:Product}) => {
               Qty:
             </span>
             <div className="flex items-center justify-center gap-5">
-              <Button disabled={quantity <=1} onClick={() => setQuantity(quantity === 1 ? 1 : quantity - 1)} size={"icon"} className={cn("w-fit px-3", quantity > 1 ? "bg-red-700 hover:bg-red-700" : "bg-red-400 hover:bg-red-400")} >
+              <Button disabled={quantity <= 1} onClick={() => setQuantity(quantity === 1 ? 1 : quantity - 1)} size={"icon"} className={cn("w-fit px-3", quantity > 1 ? "bg-red-700 hover:bg-red-700" : "bg-red-400 hover:bg-red-400")} >
                 <FaMinus size={15} />
               </Button>
               <span className="text-black text-lg w-10 font-semibold flex justify-center items-center">{quantity}</span>
-              <Button disabled={productDetails.quantity <=quantity} onClick={() => setQuantity(quantity + 1)} className="bg-red-700 px-3 w-fit hover:bg-red-700">
+              <Button disabled={productDetails.quantity <= quantity} onClick={() => setQuantity(quantity + 1)} className="bg-red-700 px-3 w-fit hover:bg-red-700">
                 <FaPlus size={15} />
               </Button>
             </div>
@@ -150,7 +166,7 @@ const ProductInfo = ({productDetails}:{productDetails:Product}) => {
         </div>
         {/* add to card button */}
         <div className="flex items-center mt-5  border-red-600 justify-between gap-5">
-          <Button className="w-full py-6 bg-red-700 hover:bg-red-700 text-md font-semibold">Add to Cart</Button>
+          <Button disabled={productDetails.quantity < 1} className="w-full py-6 bg-red-700 hover:bg-red-700 text-md font-semibold">Add to Cart</Button>
           <Button variant={"outline"} className="px-4 border-gray-400 py-4">
             <FaRegHeart size={20} />
           </Button>
@@ -160,11 +176,11 @@ const ProductInfo = ({productDetails}:{productDetails:Product}) => {
           <span className="font-semibold text-lg">Key Specification </span>
           <ul className="flex flex-col mt-3 list-disc gap-1">
             {
-              productDetails.keySpecification?.map(({key,value},index)=>(
+              productDetails.keySpecification?.map(({ key, value }: { key: string, value: string }, index: number) => (
                 <li key={index}><span className="font-semibold text-md">{key}:</span>{value}</li>
               ))
             }
-            
+
           </ul>
         </div>
       </div>

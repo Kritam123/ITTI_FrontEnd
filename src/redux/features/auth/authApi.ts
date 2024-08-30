@@ -62,7 +62,7 @@ export const authApi = apiSlice.injectEndpoints({
                 body:data,
                 credentials:"include" as const,
             }),
-            async onQueryStarted(_, {queryFulfilled,dispatch}) {
+            async onQueryStarted(_, {dispatch}) {
                dispatch(userDeleteForgetToken())
             }
         }),

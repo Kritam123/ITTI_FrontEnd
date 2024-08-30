@@ -75,3 +75,13 @@ interface ProductImage {
     rating:number,
     createdAt:Date
 }
+interface CartProduct {
+  title:string,
+  price:number,
+  discountPrice:number,
+  quantity:number,
+  productImages:string,
+  slug_name:string,
+  productId:string,
+  _id:string
+}

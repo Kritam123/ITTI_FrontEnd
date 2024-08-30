@@ -1,6 +1,8 @@
+import { useSelector } from "react-redux";
 import CartItem from "./CartItem";
-
+import { RootState } from "@/redux/store";
 const CartLists = () => {
+  const {carts} = useSelector((state:RootState)=>state.products);
   return (
     <div>
       {" "}
@@ -10,16 +12,11 @@ const CartLists = () => {
 
       {/* cartitems */}
       <div className="flex flex-col gap-3 mt-6">
-        <CartItem/>
-        <CartItem/>
-        <CartItem/>
-        <CartItem/>
-        <CartItem/>
-        <CartItem/>
-        <CartItem/>
-        <CartItem/>
-        <CartItem/>
-        <CartItem/>
+        {
+          carts?.map((item)=>(
+          <CartItem cart={item}/>  
+          ))
+        }
       </div>
     </div>
   );

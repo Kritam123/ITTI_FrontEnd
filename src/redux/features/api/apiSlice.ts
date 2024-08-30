@@ -6,7 +6,7 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: BASE_URL,
   }),
-  tagTypes:["getUser","getUserAddress","getUserAddressById"],
+  tagTypes:["getUser","getUserAddress","getUserAddressById","getUserCarts"],
   endpoints: (builder) => ({
     refreshToken: builder.query({
       query: (tokenRefresh) => ({

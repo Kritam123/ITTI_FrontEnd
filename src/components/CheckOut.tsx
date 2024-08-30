@@ -3,7 +3,7 @@ import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { useState } from "react"
 
-const CheckOut = () => {
+const CheckOut = ({total}:{total:number | undefined}) => {
   const [text, setText] = useState<string | undefined>("");
   return (
     <div className="p-3">
@@ -13,7 +13,7 @@ const CheckOut = () => {
       {/* subtotal */}
       <div className="flex justify-between mt-3">
         <span className=" text-md">Subtotal</span>
-        <span className="text-lg text-red-600 font-semibold">रु 1,53,000</span>
+        <span className="text-lg text-red-600 font-semibold">रु {total}</span>
       </div>
       {/* shipping charges */}
       <div className="flex justify-between mt-3">
@@ -29,7 +29,7 @@ const CheckOut = () => {
       {/* grand total */}
       <div className="flex justify-between mt-3">
         <span className=" text-md">Grand total</span>
-        <span className="text-lg text-red-600 font-semibold">रु 1,53,000</span>
+        <span className="text-lg text-red-600 font-semibold">रु {total}</span>
       </div>
       <Button className="w-full mt-3 py-6 bg-red-700 hover:bg-red-500 text-md font-semibold">Proceed to Checkout</Button>
 

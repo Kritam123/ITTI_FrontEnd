@@ -22,15 +22,15 @@ const MobileCategoryFilter = ({ categories, maxPrice, minPrice, handlePrice, set
   }
   return (
     <div className=''>
-     <div className='flex sticky top-0 bg-white shadow-sm p-3 z-[1000] justify-between items-center'>
+      <div className="w-full mt-10 rounded-md overflow-y-scroll h-screen shadow-lg p-1shadow-slate-200">
+      <div className='flex sticky top-2 bg-white shadow-sm p-3 z-[1000] justify-between items-center'>
      <h1 className="text-xl pl-5 font-semibold">Filters</h1>
       <Button variant={"outline"} size={"icon"} onClick={()=>setOpen(false)}>
       <X className='cursor-pointer '/>
       </Button>
      </div>
-      <div className="w-full mt-10 rounded-md overflow-y-scroll h-fit shadow-lg p-1 min-h-[100vh]  shadow-slate-200">
         {/* price */}
-        <div className="p-5 pb-0">
+        <div className="pt-16 p-5">
           <h1 className="font-semibold font-lg">Price</h1>
           <div className="flex gap-5 mt-4 items-center">
             <Input className="outline outline-2" readOnly placeholder={`NPR ${minPrice}`} />

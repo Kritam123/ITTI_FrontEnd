@@ -6,9 +6,9 @@ interface FilterProductsProps {
     pages:number,
     page:number,
     product:{} | Product,
-    review:{} | undefined
+    review:{} | undefined,
+    carts:[] | CartProduct[] 
 }
-
 
 let initialState:FilterProductsProps = {
     products:[],
@@ -16,10 +16,9 @@ let initialState:FilterProductsProps = {
     page:1,
     pages:0,
     product:{},
-    review:{}
+    review:{},
+    carts:JSON.parse(localStorage.getItem("carts")!) || [], 
 }
-
-
 const productSlice = createSlice({
     name:"product",
     initialState,
@@ -35,11 +34,21 @@ const productSlice = createSlice({
         },
         ProductReview:(state,action:PayloadAction<{review:{}}>)=>{
             state.review = action.payload.review
+        },
+        // this login user cartproduct slice
+        CartProducts:(state,action:PayloadAction<{cart:CartProduct}>)=>{
+            // @ts-ignore
+            if(!state.carts.includes(action.payload.cart)){
+                state.carts = [...state.carts,action.payload.cart];
+            }
+            // localStorage.setItem("carts",JSON.stringify(state.carts));
+        },
+        // this is login user cartproduct slice
+        getCartProducts:(state,action:PayloadAction<{carts:CartProduct[]}>)=>{
+            state.carts = [...action.payload.carts];
+            // localStorage.setItem("carts",JSON.stringify(state.carts));
         }
     }
 })
-
-
-
-export const {filterProducts,getSingleProduct,ProductReview} =  productSlice.actions;
+export const {filterProducts,getSingleProduct,ProductReview,CartProducts,getCartProducts} =  productSlice.actions;
 export default productSlice.reducer;

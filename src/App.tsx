@@ -64,8 +64,6 @@ window.onbeforeunload = ()=>{
         <Route path="/search/result" element={<ProductsSearch />} />
         <Route path="/compare" element={<CompareProducts />} />
         <Route path="/checkout/cart" element={<CartProducts />} />
-
-
         {/* dashboard rotues */}
         {
           <Route element={<ProtectedRoute  isAuthenticated={isAuthenticated}/>}>
@@ -80,27 +78,22 @@ window.onbeforeunload = ()=>{
             <Route path="/dashboard/wishlist" element={<div className="flex px-10 py-10 ">
               <DashboardSideBar />
               <UserFavList />
-
             </div>} />
             <Route path="/dashboard/address" element={<div className="flex px-10 py-10 ">
               <DashboardSideBar />
               <UserAddress />
-
             </div>} />
             <Route path="/dashboard/account/edit" element={<div className="flex px-10 py-10">
               <DashboardSideBar />
               <UserAccountEdit />
-
             </div>} />
             <Route path="/dashboard/review" element={<div className="flex px-10 py-10">
               <DashboardSideBar />
               <UserProductReviews />
-
             </div>} />
             <Route path="/dashboard/address/edit/:addressId" element={<div className="flex px-10 gap-5 py-10">
               <DashboardSideBar />
               <UserAddressEditById />
-
             </div>} />
           </Route>
         }

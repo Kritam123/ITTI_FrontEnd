@@ -5,8 +5,35 @@ import { FaRegStar } from "react-icons/fa";
 import { FaStar, FaRegStarHalfStroke } from "react-icons/fa6";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
-import React from "react";
+import React, { useEffect } from "react";
+import { useAddToCartMutation } from "@/redux/features/product/productApi";
+import { toast } from "sonner";
 const ProductItem = ({product}:{product:Product}) => {
+  const [addCart,{isError,isLoading,error,isSuccess}] = useAddToCartMutation()
+  const addToCart = async()=>{
+      try {
+        let data = {
+          title:product.title,
+  price:product.price,
+  discountPrice:product.discountPrice,
+  quantity:1,
+  slug_name:product.slug_name,
+  productId:product._id,
+  productImages:product.productImages[0].smallImgUrl
+        }
+        await addCart(data);
+      } catch (error) {
+        console.log(error);
+      }
+  }
+  useEffect(()=>{
+    if(isSuccess){
+      toast.success("Add Product to Cart!");
+    }
+    if(isError || error){
+      toast.error("Something Went Wrong!")
+    }
+  },[isSuccess,isError])
   return (
     <div className="max-w-96   overflow-hidden  max-h-[500px] flex p-2 relative flex-col">
     {/* love icon */}
@@ -52,6 +79,7 @@ const ProductItem = ({product}:{product:Product}) => {
     <p className="text-[20px] font-semibold  text-red-700">रु  {product.discountPrice}</p>
     {/* button */}
     <Button
+    onClick={addToCart} disabled={product.quantity < 1 || isLoading}
       className="mt-2 w-full py-6 bg-red-700 hover:bg-red-500 font-semibold text-[17px]"
     >
       Add to Cart

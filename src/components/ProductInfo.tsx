@@ -34,6 +34,14 @@ const ProductInfo = ({ productDetails }: { productDetails: Product | any }) => {
      let averageRating = Math.floor(totalRating / productDetails.reviews.length);
     return averageRating;
   }
+  const addToCart = async()=>{
+      try {
+       if ( productDetails.quantity < 1) return;
+        
+      } catch (error) {
+        console.log("Cart",error);
+      }
+  }
   useEffect(() => {
     if (productDetails.productImages) {
       setPreviewImage(productDetails.productImages[0].smallImgUrl);
@@ -166,7 +174,7 @@ const ProductInfo = ({ productDetails }: { productDetails: Product | any }) => {
         </div>
         {/* add to card button */}
         <div className="flex items-center mt-5  border-red-600 justify-between gap-5">
-          <Button disabled={productDetails.quantity < 1} className="w-full py-6 bg-red-700 hover:bg-red-700 text-md font-semibold">Add to Cart</Button>
+          <Button onClick={addToCart} disabled={productDetails.quantity < 1} className="w-full py-6 bg-red-700 active:bg-red-800 hover:bg-red-500 text-md font-semibold">Add to Cart</Button>
           <Button variant={"outline"} className="px-4 border-gray-400 py-4">
             <FaRegHeart size={20} />
           </Button>

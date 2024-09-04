@@ -7,7 +7,8 @@ interface FilterProductsProps {
     page:number,
     product:{} | Product,
     review:{} | undefined,
-    carts:[] | CartProduct[] 
+    carts:[] | CartProduct[]
+    whistlists:[] |WhistListProduct[] 
 }
 
 let initialState:FilterProductsProps = {
@@ -18,6 +19,7 @@ let initialState:FilterProductsProps = {
     product:{},
     review:{},
     carts:JSON.parse(localStorage.getItem("carts")!) || [], 
+    whistlists:[]
 }
 const productSlice = createSlice({
     name:"product",
@@ -41,14 +43,22 @@ const productSlice = createSlice({
             if(!state.carts.includes(action.payload.cart)){
                 state.carts = [...state.carts,action.payload.cart];
             }
-            // localStorage.setItem("carts",JSON.stringify(state.carts));
         },
         // this is login user cartproduct slice
         getCartProducts:(state,action:PayloadAction<{carts:CartProduct[]}>)=>{
             state.carts = [...action.payload.carts];
-            // localStorage.setItem("carts",JSON.stringify(state.carts));
+        },
+        WhistListProducts:(state,action:PayloadAction<{whistlist:WhistListProduct}>)=>{
+            // @ts-ignore
+            if(!state.whistlists.includes(action.payload.whistlist)){
+                state.whistlists = [...state.whistlists,action.payload.whistlist];
+            }
+        },
+        // this is login user cartproduct slice
+        getWhistListProducts:(state,action:PayloadAction<{whistlists:WhistListProduct[]}>)=>{
+            state.whistlists = [...action.payload.whistlists];
         }
     }
 })
-export const {filterProducts,getSingleProduct,ProductReview,CartProducts,getCartProducts} =  productSlice.actions;
+export const {filterProducts,getSingleProduct,ProductReview,CartProducts,getCartProducts,WhistListProducts,getWhistListProducts} =  productSlice.actions;
 export default productSlice.reducer;

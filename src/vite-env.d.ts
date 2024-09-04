@@ -31,6 +31,7 @@ interface UserDetailsProps {
     addresses:[],
     _id:String,
     refreshToken:string
+    whistlists:[string]
 }
 
 // products types
@@ -78,6 +79,18 @@ interface ProductImage {
 interface CartProduct {
   title:string,
   price:number,
+  discountPrice:number,
+  quantity:number,
+  productImages:string,
+  slug_name:string,
+  productId:string,
+  _id:string
+}
+
+interface WhistListProduct {
+  title:string,
+  price:number,
+  rating:number,
   discountPrice:number,
   quantity:number,
   productImages:string,

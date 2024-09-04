@@ -1,10 +1,15 @@
 import { Button } from "../ui/button";
 import { FaRegHeart } from "react-icons/fa";
+// @ts-ignore
 import ReactStars from "react-rating-stars-component";
 import { FaRegStar } from "react-icons/fa";
 import { FaStar, FaRegStarHalfStroke } from "react-icons/fa6";
 import { Link } from "react-router-dom";
+// import { useSelector } from "react-redux";
+// import { RootState } from "@/redux/store";
 const CardProduct = ({name = "kritam"}) => {
+  
+  
   return (
     <Link to={`/product/${name}`} className="max-w-60 flex  relative flex-col">
       {/* love icon */}

@@ -1,4 +1,4 @@
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaRegHeart,FaHeart  } from "react-icons/fa";
 // @ts-ignore
 import ReactStars from "react-rating-stars-component";
 import { FaRegStar } from "react-icons/fa";
@@ -6,46 +6,63 @@ import { FaStar, FaRegStarHalfStroke } from "react-icons/fa6";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 import React, { useEffect } from "react";
-import { useAddToCartMutation } from "@/redux/features/product/productApi";
+import { useAddToCartMutation, useDeleteWhistListProductMutation } from "@/redux/features/product/productApi";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-const ProductItem = ({product}:{product:Product}) => {
-  const [addCart,{isError,isLoading,error,isSuccess}] = useAddToCartMutation();
-  const {whistlists} = useSelector((state:RootState)=>state.products);
-  const isFavList = whistlists?.find((item:WhistListProduct)=>item.productId === product._id)
-  const addToCart = async()=>{
-      try {
-        let data = {
-          title:product.title,
-  price:product.price,
-  discountPrice:product.discountPrice,
-  quantity:1,
-  slug_name:product.slug_name,
-  productId:product._id,
-  productImages:product.productImages[0].smallImgUrl
+const WhistListItem = ({product}:{product:WhistListProduct}) => {
+    const {userDetails} = useSelector((state:RootState)=>state.auth)
+  const [addCart,{isError,isLoading,error,isSuccess}] = useAddToCartMutation()
+  const [deleteWhistList,{isSuccess:deleteSuccess,isLoading:deleteLoading,isError:deleteIsError,error:deleteError}]= useDeleteWhistListProductMutation();
+  const isFavList = userDetails?.whistlists?.find((item:string)=>item === product.productId)
+  const deleteFavItem = async()=>{
+    try {
+        const {productId} = product;
+        const data = {
+          productId
         }
-        await addCart(data);
-      } catch (error) {
+       await deleteWhistList(data);        
+    } catch (error) {
         console.log(error);
+    }
+}
+const addToCart = async ()=>{
+    try {
+      let data = {
+        title:product.title,
+price:product.price,
+discountPrice:product.discountPrice,
+quantity:1,
+slug_name:product.slug_name,
+productId:product.productId,
+productImages:product.productImages
       }
-  }
+      await addCart(data);
+    } catch (error) {
+      console.log(error);
+    }
+}
   useEffect(()=>{
     if(isSuccess){
       toast.success("Add Product to Cart!");
     }
-    if(isError || error){
-      toast.error("Something Went Wrong!")
+    if(deleteSuccess){
+      toast.success("Cart Deleted SuccessFully");
     }
-  },[isSuccess,isError])
+    if(isError && error ){
+      toast.error("Something went wrong")
+    }
+    if(deleteIsError && deleteError) {
+      toast.error("Something went wrong")
+    }
+  },[isSuccess,isError,deleteSuccess,deleteError,deleteIsError])
   return (
     <div className="max-w-96   overflow-hidden  max-h-[500px] flex p-2 relative flex-col">
     {/* love icon */}
     {
-      isFavList ? 
-    <FaHeart size={18} className="absolute text-red-600 right-5 top-0"/>
-      :
-    <FaRegHeart size={18} className="absolute right-5 top-0"/>
+    isFavList ?   <FaHeart className="absolute right-5 top-0 text-red-600 text-xl"/>
+    :<FaRegHeart  size={18} className={cn("absolute right-5 top-0")}/>
 
     }
     {/* image */}
@@ -53,7 +70,7 @@ const ProductItem = ({product}:{product:Product}) => {
    <div className="flex w-[80%] min-h-[200px]  max-h-[300px] justify-center items-center ">
       <img
         className="w-full h-full object-fill"
-        src={product.productImages[0].smallImgUrl ? product.productImages[0].smallImgUrl :"https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg" }
+        src={product.productImages ? product.productImages :"https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg" }
         alt="png_image"
         onError={(e:React.SyntheticEvent<HTMLImageElement,Event>)=>{e.currentTarget.src = "https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg"}}
       />
@@ -88,14 +105,25 @@ const ProductItem = ({product}:{product:Product}) => {
     {/* price */}
     <p className="text-[20px] font-semibold  text-red-700">रु  {product.discountPrice}</p>
     {/* button */}
+    <div className="flex gap-x-2">
     <Button
-    onClick={addToCart} disabled={product.quantity < 1 || isLoading}
+    onClick={addToCart} disabled={isLoading || deleteLoading}
       className="mt-2 w-full py-6 bg-red-700 hover:bg-red-500 font-semibold text-[17px]"
     >
       Add to Cart
     </Button>
+    <Button
+    onClick={deleteFavItem}
+    disabled={isLoading ||deleteLoading}
+    variant={"outline"}
+      className="mt-2 w-full py-6 text-[16px]"
+    >
+    Remove Item
+    </Button>
+    </div>
+    <></>
     </div>
   </div>
   )
 }
-export default ProductItem
+export default WhistListItem

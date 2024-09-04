@@ -27,15 +27,15 @@ const CartItem = ({cart}:{cart:CartProduct}) => {
        await deleteCart(data);
       } catch (error) {
         console.log(error);
-        toast.error("Something went wrong")
+        toast.error("Something went wrong");
       }
 }
   useEffect(()=>{
     if(isSuccess){
-      toast.success("Cart Updated Successfully")
+      toast.success("Cart Updated Successfully");
     }
     if(deleteSuccess){
-      toast.success("Cart Deleted SuccessFully")
+      toast.success("Cart Deleted SuccessFully");
     }
     if(isError && error ){
       toast.error("Something went wrong")
@@ -70,7 +70,7 @@ const CartItem = ({cart}:{cart:CartProduct}) => {
                 <div className="space-x-2">
                     <span className="font-semibold ">Qty:</span>
                     {/* select */}
-                    <select defaultValue={cart.quantity} value={cart.quantity} onChange={(e:React.ChangeEvent<HTMLSelectElement>)=>handleCartUpdate(e.target.value)} className="w-20 py-1 bg-transparent border border-black rounded-sm  px-3" name="" id="">
+                    <select value={cart.quantity} onChange={(e:React.ChangeEvent<HTMLSelectElement>)=>handleCartUpdate(e.target.value)} className="w-20 py-1 bg-transparent border border-black rounded-sm  px-3" name="" id="">
                         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((_, i) => {
                             return (
                                 <option className="w-16" key={i + 1} value={i + 1}>

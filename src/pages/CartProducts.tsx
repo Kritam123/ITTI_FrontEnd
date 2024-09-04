@@ -20,13 +20,13 @@ const CartProducts = () => {
   },[isAuthenticated])
   const [total,setTotal] = useState<number>();
   useMemo(() => {
-    const value =  carts.reduce((sum, curr:CartProduct) =>
+    const value = ()=> ( carts.reduce((sum, curr:CartProduct) =>
     {
       // @ts-ignore
-      return sum + parseInt(curr.price * curr.quantity);
+      return sum + parseInt(curr.price) * curr.quantity;
       }, 
-      0);
-    setTotal(value);  
+      0));
+    setTotal(value());  
   }, [carts]);
   return (
     <div className="px-14 pt-8   min-h-screen">

@@ -5,7 +5,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { FaPlus, FaMinus, FaRegHeart } from "react-icons/fa";
+import { FaPlus, FaMinus, FaRegHeart, FaHeart } from "react-icons/fa";
 import { FcInTransit } from "react-icons/fc";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 // @ts-ignore
@@ -17,6 +17,10 @@ import { FaRegStar } from "react-icons/fa";
 import { FaStar, FaRegStarHalfStroke } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAddFavListMutation, useAddToCartMutation, useDeleteWhistListProductMutation } from "@/redux/features/product/productApi";
+import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 interface ReivewProps {
   name: string, email: string,
   reviewText: string,
@@ -26,32 +30,86 @@ const ProductInfo = ({ productDetails }: { productDetails: Product | any }) => {
   const [quantity, setQuantity] = useState<number>(1);
   const [active, setActive] = useState(0)
   const [previewImage, setPreviewImage] = useState('');
+  // const {userDetails} = useSelector((state:RootState)=>state.auth);
+  const {whistlists} = useSelector((state:RootState)=>state.products);
   const [largeImage, setLargeImage] = useState('');
-  const [rating, setRating] = useState<number>( 0 );
+  const [rating, setRating] = useState<number>(0);
+  const isFavList =whistlists?.find((item:WhistListProduct)=>item.productId === productDetails._id);
+  const [addCart, { isError, isLoading, error, isSuccess }] = useAddToCartMutation()
+  const [addFavList, { isError:favIsError, isLoading:favLoading, error:favError, isSuccess:favIsSuccess }] = useAddFavListMutation()
+  const [deleteFav,{isLoading:deleteIsLoading,isError:deleteIsError,isSuccess:deleteIsSuccess,error:deleteError}] = useDeleteWhistListProductMutation();
   function calculateAverageRating() {
     if (!productDetails.reviews || productDetails.reviews.length === 0) return 0;
-    const totalRating = productDetails.reviews.reduce((sum: number, review:ReivewProps ) => sum + review.rating, 0);
-     let averageRating = Math.floor(totalRating / productDetails.reviews.length);
+    const totalRating = productDetails.reviews.reduce((sum: number, review: ReivewProps) => sum + review.rating, 0);
+    let averageRating = Math.floor(totalRating / productDetails.reviews.length);
     return averageRating;
   }
-  const addToCart = async()=>{
-      try {
-       if ( productDetails.quantity < 1) return;
-        
-      } catch (error) {
-        console.log("Cart",error);
+const addToFavList = async()=>{
+  try {
+    if(!isFavList){
+      let data = {
+        title: productDetails.title,
+        price: productDetails.price,
+        discountPrice: productDetails.discountPrice,
+        quantity: quantity,
+        rating:productDetails.rating,
+        slug_name: productDetails.slug_name,
+        productId: productDetails._id,
+        productImages: productDetails.productImages[0].smallImgUrl
       }
+      await addFavList(data);
+    }
+    else {
+      let data = {
+        productId:productDetails._id
+      }
+      await deleteFav(data);   
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+  const addToCart = async () => {
+    try {
+      if (productDetails.quantity < 1) return;
+      let data = {
+        title: productDetails.title,
+        price: productDetails.price,
+        discountPrice: productDetails.discountPrice,
+        quantity: quantity,
+        slug_name: productDetails.slug_name,
+        productId: productDetails._id,
+        productImages: productDetails.productImages[0].smallImgUrl
+      }
+      await addCart(data);
+    } catch (error) {
+      console.log("Cart", error);
+    }
   }
   useEffect(() => {
     if (productDetails.productImages) {
       setPreviewImage(productDetails.productImages[0].smallImgUrl);
       setLargeImage(productDetails.productImages[0].previewImgUrl);
     }
-    if(productDetails.reviews?.length >1 && productDetails.reviews){
-      const rating  = calculateAverageRating();
+    if (productDetails.reviews?.length > 1 && productDetails.reviews) {
+      const rating = calculateAverageRating();
       setRating(rating);
     }
-  }, [productDetails,rating])
+  }, [productDetails, rating])
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Add Product to Cart!");
+    }
+    if(favIsSuccess){
+      toast.success("Add Product to FavList!");
+    }
+    if(deleteIsSuccess){
+      toast.success("Remove Product from FavList!");
+    }
+    if (isError || error || favError || favIsError || deleteError|| deleteIsError) {
+      toast.error("Something Went Wrong!")
+    }
+  }, [isSuccess, isError,favError,favIsError,favIsSuccess,deleteIsError,deleteIsSuccess,deleteError])
   return (
     <div className="flex justify-between gap-16 mt-5 w-full">
       {/* left side */}
@@ -169,14 +227,17 @@ const ProductInfo = ({ productDetails }: { productDetails: Product | any }) => {
                 <FaPlus size={15} />
               </Button>
             </div>
-
           </div>
         </div>
         {/* add to card button */}
         <div className="flex items-center mt-5  border-red-600 justify-between gap-5">
-          <Button onClick={addToCart} disabled={productDetails.quantity < 1} className="w-full py-6 bg-red-700 active:bg-red-800 hover:bg-red-500 text-md font-semibold">Add to Cart</Button>
-          <Button variant={"outline"} className="px-4 border-gray-400 py-4">
-            <FaRegHeart size={20} />
+          <Button onClick={addToCart} disabled={productDetails.quantity < 1 || isLoading} className="w-full py-6 bg-red-700 active:bg-red-800 hover:bg-red-500 text-md font-semibold">Add to Cart</Button>
+          <Button disabled={favLoading || deleteIsLoading} onClick={addToFavList} variant={"outline"} className="px-4 border-gray-400 py-4">
+            {
+              isFavList ? <FaHeart size={20} className="text-red-600"/> :
+            <FaRegHeart  size={20} />
+
+            }
           </Button>
         </div>
         {/* features lints */}

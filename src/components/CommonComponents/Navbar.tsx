@@ -27,11 +27,12 @@ import { RootState } from "@/redux/store";
 import queryString from "query-string";
 import DrawerComapre from "../DrawerComapre";
 import NavCartComponet from "../NavCartComponet";
-import { useLazyGetCartProductsQuery } from "@/redux/features/product/productApi";
+import { useLazyGetCartProductsQuery, useLazyGetWhistListProductsQuery } from "@/redux/features/product/productApi";
 const Navbar = () => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const { carts } = useSelector((state: RootState) => state.products);
+  const { carts,whistlists } = useSelector((state: RootState) => state.products);
  const [loadCarts,{}] = useLazyGetCartProductsQuery();
+ const [loadFavList,{}] = useLazyGetWhistListProductsQuery();
   const [isToggle, setIsToggle] = useState<boolean>(false);
   const navigate = useNavigate();
   const [search, setSearch] = useState("")
@@ -44,6 +45,8 @@ const Navbar = () => {
       if(isAuthenticated){
         // @ts-ignore
          await loadCarts();
+        // @ts-ignore
+         await loadFavList();
       }
     }
     func();
@@ -99,12 +102,12 @@ const Navbar = () => {
           <Badge className="absolute -top-3 -right-3 hover:bg-red-500 bg-red-600">{carts?.length}</Badge>
           }
           </div>
-
           <span className="max-[950px]:hidden block  text-[15px] font-medium  ">
             Shopping Cart
           </span>
           <div className="absolute top-10 right-2 z-10 group-hover:block hidden">
-            <Card className="shadow-lg w-[350px]">
+            <Card 
+             className="shadow-lg w-[350px]">
               {carts.length < 1 ? (
                 <div className="flex justify-center flex-col items-center">
                   <CardHeader>
@@ -130,7 +133,13 @@ const Navbar = () => {
         </Button>
         <Link to={isAuthenticated ? "/dashboard/wishlist" : "/customer/account/login"}>
           <Button className="bg-transparent hover:text-red-600 hover:bg-transparent text-gray-600  flex gap-3">
+            <div className="relative">
             <Heart />{" "}
+            {
+              whistlists?.length > 0 &&
+              <Badge className="absolute -top-3 -right-3 hover:bg-red-500 bg-red-600">{whistlists?.length}</Badge>
+            }
+            </div>
             <span className="max-[950px]:hidden block text-[15px] font-medium">
               My Wish List
             </span>

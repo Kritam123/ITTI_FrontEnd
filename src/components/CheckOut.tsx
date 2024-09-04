@@ -13,7 +13,7 @@ const CheckOut = ({total}:{total:number | undefined}) => {
       {/* subtotal */}
       <div className="flex justify-between mt-3">
         <span className=" text-md">Subtotal</span>
-        <span className="text-lg text-red-600 font-semibold">रु {total}</span>
+        <span className="text-lg text-red-600 font-semibold">रु {total?.toFixed(2)}</span>
       </div>
       {/* shipping charges */}
       <div className="flex justify-between mt-3">
@@ -29,7 +29,7 @@ const CheckOut = ({total}:{total:number | undefined}) => {
       {/* grand total */}
       <div className="flex justify-between mt-3">
         <span className=" text-md">Grand total</span>
-        <span className="text-lg text-red-600 font-semibold">रु {total}</span>
+        <span className="text-lg text-red-600 font-semibold">रु {total?.toFixed(2)}</span>
       </div>
       <Button className="w-full mt-3 py-6 bg-red-700 hover:bg-red-500 text-md font-semibold">Proceed to Checkout</Button>
 

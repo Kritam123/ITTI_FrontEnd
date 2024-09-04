@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { CartProducts, filterProducts, getCartProducts, getSingleProduct, ProductReview } from "./productSlice";
+import { CartProducts, filterProducts, getCartProducts, getSingleProduct, getWhistListProducts, ProductReview, WhistListProducts } from "./productSlice";
 
 const productApi = apiSlice.injectEndpoints({
     endpoints:(builder)=>({
@@ -111,8 +111,54 @@ const productApi = apiSlice.injectEndpoints({
                 credentials:"include" as const
             }),
             invalidatesTags:["getUserCarts"]
-         })
+         }),
+         getWhistListProducts:builder.query({
+            query:()=>({
+                url:"product/whistlists/all",
+                method:"GET",
+                credentials:"include"
+            }),
+            providesTags:["getUserFavLists"],
+            async onQueryStarted(_, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;             
+                    dispatch(getWhistListProducts({
+                      whistlists:result.data.data.whistListProducts
+                    }))
+                } catch (error: any) {
+                    console.log(error);
+                }
+            },
+        }),
+         addFavList:builder.mutation({
+            query:(data)=>({
+             url:"/product/whistlist/add",
+             method:"POST",
+              body:data,
+             credentials:"include"
+            }),
+            invalidatesTags:["getUserFavLists"],
+            async onQueryStarted(_, { queryFulfilled, dispatch }) {
+             try {
+                 const result = await queryFulfilled;
+                 dispatch(WhistListProducts({
+                   whistlist:result.data.data.favProduct
+                 }))
+             } catch (error: any) {
+                 console.log(error);
+             }
+         },
+         }),
+         deleteWhistListProduct:builder.mutation({
+            query:({productId})=>({
+                url:`/product/whistlist/delete/${productId}`,
+                method:'DELETE',
+                body:{productId},
+                credentials:"include" as const
+            }),
+            invalidatesTags:["getUserFavLists"]
+         }),
     })
 })
 
-export const {useGetFilterProductsQuery,useAddToCartMutation,useDeleteCartProductMutation,useLazyGetCartProductsQuery,useLazyGetFilterProductsQuery,useLazyGetProductBySlugQuery,useCreateReivewMutation,useGetCartProductsQuery,useUpdateCartSingleMutation} = productApi;
+export const {useGetFilterProductsQuery,useAddToCartMutation,useDeleteCartProductMutation,useLazyGetCartProductsQuery,useLazyGetFilterProductsQuery,useLazyGetProductBySlugQuery,useCreateReivewMutation,useGetCartProductsQuery,useUpdateCartSingleMutation,useLazyGetWhistListProductsQuery,useAddFavListMutation,useDeleteWhistListProductMutation} = productApi;

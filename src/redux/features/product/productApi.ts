@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { CartProducts, filterProducts, getCartProducts, getSingleProduct, getWhistListProducts, ProductReview, WhistListProducts } from "./productSlice";
+import { CartProducts, filterProducts, getCartProducts, getComparesProducts, getSingleProduct, getWhistListProducts, ProductReview, WhistListProducts } from "./productSlice";
 
 const productApi = apiSlice.injectEndpoints({
     endpoints:(builder)=>({
@@ -130,6 +130,24 @@ const productApi = apiSlice.injectEndpoints({
                 }
             },
         }),
+         getCompareProducts:builder.query({
+            query:()=>({
+                url:"product/compares/all",
+                method:"GET",
+                credentials:"include"
+            }),
+            providesTags:["getUserCompareLists"],
+            async onQueryStarted(_, { queryFulfilled, dispatch }){
+                try {
+                    const result = await queryFulfilled;             
+                    dispatch(getComparesProducts({
+                      compares:result.data.data.compares
+                    }))
+                } catch (error: any) {
+                    console.log(error);
+                }
+            },
+        }),
          addFavList:builder.mutation({
             query:(data)=>({
              url:"/product/whistlist/add",
@@ -151,14 +169,41 @@ const productApi = apiSlice.injectEndpoints({
          }),
          deleteWhistListProduct:builder.mutation({
             query:({productId})=>({
-                url:`/product/whistlist/delete/${productId}`,
+                url:`/product/compare/delete/${productId}`,
                 method:'DELETE',
                 body:{productId},
                 credentials:"include" as const
             }),
             invalidatesTags:["getUserFavLists"]
          }),
+
+         addToCompare:builder.mutation({
+            query:({productId})=>({
+             url:`/product/compare/add/${productId}`,
+             method:"POST",
+              body:{productId},
+             credentials:"include"
+            }),
+            invalidatesTags:["getUserCompareLists"],
+         }),
+         deleteCompareProduct:builder.mutation({
+            query:({productId})=>({
+                url:`/product/compare/delete/${productId}`,
+                method:'DELETE',
+                body:{productId},
+                credentials:"include" as const
+            }),
+            invalidatesTags:["getUserCompareLists"]
+         }),
+         deleteAllCompareProduct:builder.mutation({
+            query:()=>({
+                url:`/product/compare/deleteAll`,
+                method:'PATCH',
+                credentials:"include" as const
+            }),
+            invalidatesTags:["getUserCompareLists"]
+         }),
     })
 })
 
-export const {useGetFilterProductsQuery,useAddToCartMutation,useDeleteCartProductMutation,useLazyGetCartProductsQuery,useLazyGetFilterProductsQuery,useLazyGetProductBySlugQuery,useCreateReivewMutation,useGetCartProductsQuery,useUpdateCartSingleMutation,useLazyGetWhistListProductsQuery,useAddFavListMutation,useDeleteWhistListProductMutation} = productApi;
+export const {useGetFilterProductsQuery,useAddToCartMutation,useDeleteCartProductMutation,useLazyGetCartProductsQuery,useLazyGetFilterProductsQuery,useLazyGetProductBySlugQuery,useCreateReivewMutation,useGetCartProductsQuery,useUpdateCartSingleMutation,useLazyGetWhistListProductsQuery,useAddFavListMutation,useDeleteWhistListProductMutation,useLazyGetCompareProductsQuery,useAddToCompareMutation,useDeleteCompareProductMutation,useDeleteAllCompareProductMutation} = productApi;

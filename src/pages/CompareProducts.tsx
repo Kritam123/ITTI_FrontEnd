@@ -9,13 +9,15 @@ import {
 } from "@/components/ui/select";
 import { ComapreCategory } from "@/lib/CompareCategoryLists";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { RootState } from "@/redux/store";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-
 const CompareProducts = () => {
+    const {compares} = useSelector((state:RootState)=>state.products)
     return (
         <div>
-            {false ? (
+            {!(compares.length >=1) ? (
                 <div className=" h-[70vh] flex-col flex justify-center items-center ">
                     <p className="text-xl font-semibold text-gray-500">
                         No products to compare, please select atleast a product to compare{" "}
@@ -50,9 +52,11 @@ const CompareProducts = () => {
                                     );
                                 })}
                         </div>
-                        {[0, 1, 2].map(() => {
-                            return <CompareItem />;
-                        })}
+                        <div className="flex  flex-1 items-center">
+                            <CompareItem compareProduct={compares[0]} />
+                            <CompareItem compareProduct={compares[1]}/>
+                            <CompareItem  compareProduct={compares[2]}/>
+                        </div>
                     </div>
                 </div>
             )}
@@ -60,11 +64,24 @@ const CompareProducts = () => {
     );
 };
 
-function CompareItem() {
+function CompareItem({compareProduct}:{compareProduct:Product}) {
     const [selectItem, setSelectItem] = useState("");
+        const [compareItem, setCompareItem] = useState(compareProduct);
     const handleChange = (value:string)=>{
         setSelectItem(value);
     }
+    const productApi = async()=>{
+        try {
+            
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        productApi();
+    }, [compareItem])
+    
     return (
         <div className="flex-1">
             <div className="h-full">
@@ -86,17 +103,27 @@ function CompareItem() {
                         </SelectContent>
                     </Select>
                     {/* card */}
-                    <div className="space-y-3">
+                   {compareItem && <div className="space-y-3">
                         <div className="w-52 h-52">
-                            <img src="https://itti.com.np/_next/image?url=https%3A%2F%2Fadmin.itti.com.np%2Fstorage%2Fproduct%2Flenovo-ideapad-slim-1-price-nepal-ryzen-5%2Ff94f7911-b05f-4d56-b3f4-d880f158a3d2.webp&w=1920&q=75" alt="img" />
+                        <img
+        className="w-full h-full object-contain"
+        src={compareItem.productImages[0].smallImgUrl ? compareItem.productImages[0].smallImgUrl :"https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg" }
+        alt="png_image"
+        onError={(e:React.SyntheticEvent<HTMLImageElement,Event>)=>{e.currentTarget.src = "https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg"}}
+      />
                         </div>
-                        <p className="text-lg font-semibold">Lenovo IdeaPad Slim 1 2022 Ryzen 5 7520U | 8GB RAM | 512GB SSD | 14" FHD display</p>
+                        <Link to={`/product/${compareItem.slug_name}`}>
+                        <p className="text-lg font-semibold">{compareItem.title}</p>
+                        </Link>
                         <div>
-                        <span className="font-bold text-xl text-red-600">रु 60,300</span>
-
+                        <span className="font-bold text-xl text-red-600">रु {compareItem.price}</span>
                         </div>
-                    </div>
+                    </div>}
                 </div>
+{ 
+
+compareItem &&
+                <>
                 {/* category */}
                 {ComapreCategory &&
                     ComapreCategory.map((item, i) => {
@@ -121,8 +148,10 @@ function CompareItem() {
                         Add to Cart
                     </Button>}
                 </div>
-
+                </>
+}
             </div>
+                    
         </div>
     );
 }

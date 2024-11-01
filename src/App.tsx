@@ -61,7 +61,6 @@ window.onbeforeunload = ()=>{
         <Route path="/" element={<Home />} />
         <Route path="/product/:name" element={<ProductDetails />} />
         <Route path="/search/result" element={<ProductsSearch />} />
-        <Route path="/search/result" element={<ProductsSearch />} />
         <Route path="/compare" element={<CompareProducts />} />
         <Route path="/checkout/cart" element={<CartProducts />} />
         {/* dashboard rotues */}

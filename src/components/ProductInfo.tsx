@@ -17,10 +17,11 @@ import { FaRegStar } from "react-icons/fa";
 import { FaStar, FaRegStarHalfStroke } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useAddFavListMutation, useAddToCartMutation, useDeleteWhistListProductMutation } from "@/redux/features/product/productApi";
+import { useAddFavListMutation, useAddToCartMutation, useAddToCompareMutation, useDeleteCompareProductMutation, useDeleteWhistListProductMutation } from "@/redux/features/product/productApi";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { Checkbox } from "./ui/checkbox";
 interface ReivewProps {
   name: string, email: string,
   reviewText: string,
@@ -30,14 +31,16 @@ const ProductInfo = ({ productDetails }: { productDetails: Product | any }) => {
   const [quantity, setQuantity] = useState<number>(1);
   const [active, setActive] = useState(0)
   const [previewImage, setPreviewImage] = useState('');
-  // const {userDetails} = useSelector((state:RootState)=>state.auth);
-  const {whistlists} = useSelector((state:RootState)=>state.products);
+  const {whistlists,compares} = useSelector((state:RootState)=>state.products);
   const [largeImage, setLargeImage] = useState('');
   const [rating, setRating] = useState<number>(0);
   const isFavList =whistlists?.find((item:WhistListProduct)=>item.productId === productDetails._id);
-  const [addCart, { isError, isLoading, error, isSuccess }] = useAddToCartMutation()
+  const isCompareList =compares?.find((item:Product)=>item._id === productDetails._id);
+  const [addCart, { isError, isLoading, error, isSuccess }] = useAddToCartMutation();
+  const [addCompare, { isError:compareIsError, isLoading:compareIsLoading, error:compareError, isSuccess:compareSuccess,data:compareData }] = useAddToCompareMutation();
   const [addFavList, { isError:favIsError, isLoading:favLoading, error:favError, isSuccess:favIsSuccess }] = useAddFavListMutation()
   const [deleteFav,{isLoading:deleteIsLoading,isError:deleteIsError,isSuccess:deleteIsSuccess,error:deleteError}] = useDeleteWhistListProductMutation();
+  const [deleteCompare,{isLoading:comparedeleteIsLoading,isError:comparedeleteIsError,isSuccess:comparedeleteIsSuccess,error:comparedeleteError}] = useDeleteCompareProductMutation();
   function calculateAverageRating() {
     if (!productDetails.reviews || productDetails.reviews.length === 0) return 0;
     const totalRating = productDetails.reviews.reduce((sum: number, review: ReivewProps) => sum + review.rating, 0);
@@ -64,6 +67,24 @@ const addToFavList = async()=>{
         productId:productDetails._id
       }
       await deleteFav(data);   
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+const addToCompareList = async()=>{
+  try {
+    if(!isCompareList){
+      const data = {
+        productId:productDetails._id
+      }
+      await addCompare(data);
+    }
+    else {
+      let data = {
+        productId:productDetails._id
+      }
+      await deleteCompare(data);   
     }
   } catch (error) {
     console.log(error);
@@ -103,13 +124,29 @@ const addToFavList = async()=>{
     if(favIsSuccess){
       toast.success("Add Product to FavList!");
     }
+    if(compareSuccess){
+      toast.success("Add Product to CompareList!");
+    }
     if(deleteIsSuccess){
       toast.success("Remove Product from FavList!");
     }
-    if (isError || error || favError || favIsError || deleteError|| deleteIsError) {
+    if(comparedeleteIsSuccess){
+      toast.success("Remove Product from CompareList!");
+    }
+    if( compareIsError || compareError) {
+      console.log(compareData);
+      // if("data" in compareData) {
+      //       const error = compareData?.error?.messages
+      //       toast.error(error || "Error Occurs!");
+      // }
+      // else {
+      //   toast.error("Something went Wrong!")
+      // }
+    }
+    if (isError || error || favError || favIsError || deleteError|| deleteIsError  ||comparedeleteError || comparedeleteIsError) {
       toast.error("Something Went Wrong!")
     }
-  }, [isSuccess, isError,favError,favIsError,favIsSuccess,deleteIsError,deleteIsSuccess,deleteError])
+  }, [isSuccess, isError,favError,favIsError,compareSuccess,comparedeleteIsSuccess,favIsSuccess,deleteIsError,deleteIsSuccess,deleteError,compareError,comparedeleteError,compareIsError,comparedeleteIsError])
   return (
     <div className="flex justify-between gap-16 mt-5 w-full">
       {/* left side */}
@@ -162,13 +199,10 @@ const addToFavList = async()=>{
                 height: "100%",
                 "object-fit": "fit",
               },
-
-
             }}
             enlargedImageContainerClassName="bg-white"
             shouldUsePositiveSpaceLens
             isEnlargedImagePortalEnabledForTouch
-
 
           />
         </div>
@@ -213,7 +247,7 @@ const addToFavList = async()=>{
           <span className={cn("text-green-700 font-semibold", productDetails.quantity < 1 && "text-red-700")}>{productDetails.quantity > 1 ? "In Stock" : "Out of Stock"}</span>
         </div>
         {/* quantity */}
-        <div>
+        <div className="flex justify-between items-center">
           <div className="flex gap-10">
             <span className="text-gray-800 text-xl font-semibold">
               Qty:
@@ -227,6 +261,10 @@ const addToFavList = async()=>{
                 <FaPlus size={15} />
               </Button>
             </div>
+          </div>
+          <div className="flex gap-3">
+            <Checkbox checked={!!isCompareList} onCheckedChange={addToCompareList} className="outline-none focus-within:ring-0"/>
+            <span className="text-md text-neutral-600">Add To Compare</span>
           </div>
         </div>
         {/* add to card button */}

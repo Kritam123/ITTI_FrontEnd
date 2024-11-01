@@ -27,12 +27,13 @@ import { RootState } from "@/redux/store";
 import queryString from "query-string";
 import DrawerComapre from "../DrawerComapre";
 import NavCartComponet from "../NavCartComponet";
-import { useLazyGetCartProductsQuery, useLazyGetWhistListProductsQuery } from "@/redux/features/product/productApi";
+import { useLazyGetCartProductsQuery, useLazyGetCompareProductsQuery, useLazyGetWhistListProductsQuery } from "@/redux/features/product/productApi";
 const Navbar = () => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const { carts,whistlists } = useSelector((state: RootState) => state.products);
+  const { carts,whistlists,compares } = useSelector((state: RootState) => state.products);
  const [loadCarts,{}] = useLazyGetCartProductsQuery();
  const [loadFavList,{}] = useLazyGetWhistListProductsQuery();
+ const [loadCompare,{}] = useLazyGetCompareProductsQuery();
   const [isToggle, setIsToggle] = useState<boolean>(false);
   const navigate = useNavigate();
   const [search, setSearch] = useState("")
@@ -47,6 +48,8 @@ const Navbar = () => {
          await loadCarts();
         // @ts-ignore
          await loadFavList();
+        //  @ts-ignore
+        await loadCompare();
       }
     }
     func();
@@ -54,7 +57,7 @@ const Navbar = () => {
 
   return (
     <nav className="w-full max-w-[1600px] flex relative px-3 min-[768px]:h-[110px] min-[1040px]:px-14 justify-between items-center h-[70px]  ">
-      <DrawerDialog isCompare={true} open={open} setOpen={setOpen} ><DrawerComapre setOpen={setOpen} /></DrawerDialog>
+      <DrawerDialog isCompare={true} open={open} setOpen={setOpen} ><DrawerComapre open={open} setOpen={setOpen} /></DrawerDialog>
       {/* logo */}
       <Link to={"/"} className="min-w-[100px] w-[100px]  min-[768px]:w-[150px]">
         <img
@@ -88,8 +91,14 @@ const Navbar = () => {
         <Button
           onClick={() => setOpen(true)}
           className="bg-transparent text-gray-600 hover:text-red-600 hover:bg-transparent hover:bg-none flex gap-3"
-        >
+        >          
+          <div className="relative">
           <Scale />
+          {
+            compares?.length > 0 &&
+          <Badge className="absolute -top-3 -right-3 hover:bg-red-500 bg-red-600">{compares?.length}</Badge>
+          }
+          </div>
           <span className="max-[950px]:hidden block  text-[15px] font-medium">
             Compare
           </span>

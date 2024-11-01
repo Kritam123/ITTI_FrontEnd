@@ -8,7 +8,8 @@ interface FilterProductsProps {
     product:{} | Product,
     review:{} | undefined,
     carts:[] | CartProduct[]
-    whistlists:[] |WhistListProduct[] 
+    whistlists:[] |WhistListProduct[]
+    compares:[] | Product[], 
 }
 
 let initialState:FilterProductsProps = {
@@ -19,7 +20,8 @@ let initialState:FilterProductsProps = {
     product:{},
     review:{},
     carts:JSON.parse(localStorage.getItem("carts")!) || [], 
-    whistlists:[]
+    whistlists:[],
+    compares:[]
 }
 const productSlice = createSlice({
     name:"product",
@@ -57,8 +59,13 @@ const productSlice = createSlice({
         // this is login user cartproduct slice
         getWhistListProducts:(state,action:PayloadAction<{whistlists:WhistListProduct[]}>)=>{
             state.whistlists = [...action.payload.whistlists];
+        },
+        
+        getComparesProducts:(state,action:PayloadAction<{compares:Product[]}>)=>{
+        state.compares = [...action.payload?.compares];
         }
+
     }
 })
-export const {filterProducts,getSingleProduct,ProductReview,CartProducts,getCartProducts,WhistListProducts,getWhistListProducts} =  productSlice.actions;
+export const {filterProducts,getComparesProducts,getSingleProduct,ProductReview,CartProducts,getCartProducts,WhistListProducts,getWhistListProducts} =  productSlice.actions;
 export default productSlice.reducer;
